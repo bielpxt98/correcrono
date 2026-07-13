@@ -4,7 +4,12 @@ import { useEffect, useState } from "react";
 import { HomeHeroByLayout } from "@/components/HomeLayouts";
 import { SiteHeader } from "@/components/SiteHeader";
 import { formatDateLongBR } from "@/lib/format";
-import { resolveFont, resolveLayout } from "@/lib/themes";
+import {
+  colorVarsStyle,
+  resolveColor,
+  resolveFont,
+  resolveLayout,
+} from "@/lib/themes";
 import type { EventPublic } from "@/lib/types";
 
 export default function HomePage() {
@@ -15,6 +20,7 @@ export default function HomePage() {
 
   const layout = resolveLayout(event?.theme_layout);
   const font = resolveFont(event?.theme_font);
+  const color = resolveColor(event?.theme_color);
 
   useEffect(() => {
     fetch("/api/event")
@@ -53,6 +59,8 @@ export default function HomePage() {
       className="home-theme min-h-full flex flex-col bg-background text-foreground"
       data-layout={layout}
       data-font={font}
+      data-color={color}
+      style={colorVarsStyle(color)}
     >
       {loading && (
         <>

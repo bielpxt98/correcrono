@@ -19,6 +19,7 @@ function normalizeEvent(row: Record<string, unknown>): EventRow {
     shirt_sizes: asStringArray(row.shirt_sizes, ["P", "M", "G"]),
     theme_layout: String(row.theme_layout ?? "bilheteria"),
     theme_font: String(row.theme_font ?? "geist"),
+    theme_color: String(row.theme_color ?? "laranja"),
     created_at: String(row.created_at ?? ""),
     updated_at: row.updated_at ? String(row.updated_at) : undefined,
   };

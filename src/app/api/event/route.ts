@@ -5,7 +5,7 @@ import { getDemoEvent, isDemoMode, setDemoEvent } from "@/lib/demo-data";
 import { getActiveEvent } from "@/lib/event";
 import { getPaymentSettingsPublic } from "@/lib/payment-settings";
 import { getServiceSupabase, isSupabaseConfigured } from "@/lib/supabase";
-import { resolveFont, resolveLayout } from "@/lib/themes";
+import { resolveColor, resolveFont, resolveLayout } from "@/lib/themes";
 
 export async function GET() {
   if (isDemoMode()) {
@@ -65,6 +65,7 @@ const updateSchema = z.object({
   // Aceita IDs antigos e novos; normaliza com resolveLayout/resolveFont
   theme_layout: z.string().optional(),
   theme_font: z.string().optional(),
+  theme_color: z.string().optional(),
 });
 
 export async function PUT(req: NextRequest) {
@@ -100,6 +101,7 @@ export async function PUT(req: NextRequest) {
   const body = parsed.data;
   const theme_layout = resolveLayout(body.theme_layout);
   const theme_font = resolveFont(body.theme_font);
+  const theme_color = resolveColor(body.theme_color);
   const categories = body.categories.map((c) => c.trim()).filter(Boolean);
   const shirt_sizes = body.shirt_sizes.map((s) => s.trim()).filter(Boolean);
   if (categories.length === 0) {
@@ -133,6 +135,7 @@ export async function PUT(req: NextRequest) {
       shirt_sizes,
       theme_layout,
       theme_font,
+      theme_color,
       cover_image_url:
         body.cover_image_url === undefined
           ? current.cover_image_url
@@ -148,7 +151,7 @@ export async function PUT(req: NextRequest) {
       demo: true,
       event: next,
       message:
-        "Salvo com sucesso! Abra a home e atualize a página (F5) para ver o novo layout.",
+        "Salvo com sucesso! Abra a home e atualize a página (F5) para ver cores e layout.",
     });
   }
 
@@ -180,6 +183,7 @@ export async function PUT(req: NextRequest) {
         shirt_sizes,
         theme_layout,
         theme_font,
+        theme_color,
         cover_image_url:
           body.cover_image_url === undefined
             ? current.cover_image_url

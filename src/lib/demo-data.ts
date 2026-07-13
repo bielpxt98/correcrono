@@ -21,6 +21,7 @@ export const DEMO_EVENT_INITIAL: EventPublic = {
   shirt_sizes: ["PP", "P", "M", "G", "GG", "XG"],
   theme_layout: "bilheteria",
   theme_font: "geist",
+  theme_color: "laranja",
   created_at: new Date().toISOString(),
   slots_remaining: 0, // recalculado abaixo após montar inscritos
   paid_count: 0,

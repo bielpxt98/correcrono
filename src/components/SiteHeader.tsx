@@ -5,8 +5,13 @@ export function SiteHeader({ solid = false }: { solid?: boolean }) {
     <header
       className={
         solid
-          ? "border-b border-border bg-background/95 backdrop-blur sticky top-0 z-30"
-          : "absolute top-0 left-0 right-0 z-30 border-b border-white/10 bg-black/30 backdrop-blur-md"
+          ? "border-b border-border bg-background/95 backdrop-blur sticky z-30"
+          : "absolute left-0 right-0 z-30 border-b border-white/10 bg-black/30 backdrop-blur-md"
+      }
+      style={
+        solid
+          ? { top: "var(--demo-banner-h, 0px)" }
+          : { top: "var(--demo-banner-h, 0px)" }
       }
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">

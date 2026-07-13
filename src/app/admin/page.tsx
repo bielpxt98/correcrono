@@ -12,10 +12,13 @@ import {
   sortShirtKeys,
 } from "@/lib/registration-stats";
 import {
+  COLORS,
   FONTS,
   LAYOUTS,
+  resolveColor,
   resolveFont,
   resolveLayout,
+  type ColorId,
   type FontId,
   type LayoutId,
 } from "@/lib/themes";
@@ -25,6 +28,7 @@ type Tab =
   | "resumo"
   | "evento"
   | "visual"
+  | "cores"
   | "fotos"
   | "recebimento"
   | "cupons"
@@ -82,6 +86,7 @@ export default function AdminPage() {
   const [sizesText, setSizesText] = useState("PP\nP\nM\nG\nGG\nXG");
   const [themeLayout, setThemeLayout] = useState<LayoutId>("bilheteria");
   const [themeFont, setThemeFont] = useState<FontId>("geist");
+  const [themeColor, setThemeColor] = useState<ColorId>("laranja");
 
   function fillForm(ev: EventPublic) {
     setEvent(ev);
@@ -99,6 +104,7 @@ export default function AdminPage() {
     setSizesText((ev.shirt_sizes || []).join("\n"));
     setThemeLayout(resolveLayout(ev.theme_layout));
     setThemeFont(resolveFont(ev.theme_font));
+    setThemeColor(resolveColor(ev.theme_color));
   }
 
   const loadAll = useCallback(
@@ -204,6 +210,7 @@ export default function AdminPage() {
           shirt_sizes,
           theme_layout: resolveLayout(themeLayout),
           theme_font: resolveFont(themeFont),
+          theme_color: resolveColor(themeColor),
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -440,12 +447,13 @@ export default function AdminPage() {
               {(
                 [
                   ["resumo", "0. Resumo"],
-                  ["evento", "1. Dados da corrida"],
-                  ["visual", "2. Visual ★"],
-                  ["fotos", "3. Fotos"],
-                  ["recebimento", "4. Recebimento"],
-                  ["cupons", "5. Cupons"],
-                  ["inscritos", "6. Inscritos"],
+                  ["evento", "1. Dados"],
+                  ["visual", "2. Layout"],
+                  ["cores", "3. Cores"],
+                  ["fotos", "4. Fotos"],
+                  ["recebimento", "5. Recebimento"],
+                  ["cupons", "6. Cupons"],
+                  ["inscritos", "7. Inscritos"],
                 ] as const
               ).map(([id, label]) => (
                 <button
@@ -778,13 +786,94 @@ export default function AdminPage() {
                     disabled={saving}
                     className="rounded-xl bg-brand px-8 py-3.5 font-bold text-white hover:bg-brand-dark disabled:opacity-60 text-base"
                   >
-                    {saving ? "Salvando…" : "Salvar visual e aplicar na home"}
+                    {saving ? "Salvando…" : "Salvar layout e aplicar na home"}
                   </button>
                   <a
                     href="/"
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center justify-center rounded-xl border border-border bg-white px-6 py-3.5 text-sm font-semibold hover:bg-slate-50"
+                  >
+                    Abrir home →
+                  </a>
+                </div>
+              </form>
+            )}
+
+            {tab === "cores" && (
+              <form
+                onSubmit={saveEvent}
+                className="rounded-2xl border border-border bg-card p-5 md:p-8 space-y-6 shadow-sm"
+              >
+                <div>
+                  <h2 className="text-2xl font-black tracking-tight">
+                    Cores da home
+                  </h2>
+                  <p className="text-sm text-muted mt-1">
+                    Escolha a <strong>paleta de cores</strong> (botões, destaques,
+                    fundos). Funciona junto com o layout da aba 2.
+                  </p>
+                </div>
+
+                <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-950">
+                  Escolha uma cor → <strong>Salvar cores</strong> → abra a home e
+                  dê F5. Aparece confirmação ao salvar.
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {COLORS.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => setThemeColor(c.id)}
+                      className={
+                        themeColor === c.id
+                          ? "rounded-2xl border-2 border-brand p-4 text-left bg-orange-50 ring-2 ring-brand/20"
+                          : "rounded-2xl border border-border p-4 text-left bg-white hover:border-orange-300"
+                      }
+                    >
+                      <div className="flex gap-1.5 mb-3">
+                        <span
+                          className="h-10 flex-1 rounded-lg border border-black/10"
+                          style={{ background: c.vars.background }}
+                        />
+                        <span
+                          className="h-10 w-12 rounded-lg border border-black/10"
+                          style={{ background: c.vars.brand }}
+                        />
+                        <span
+                          className="h-10 w-10 rounded-lg border border-black/10"
+                          style={{ background: c.vars.brandSoft }}
+                        />
+                        <span
+                          className="h-10 w-10 rounded-lg border border-black/10"
+                          style={{ background: c.vars.card }}
+                        />
+                      </div>
+                      <p className="font-bold">{c.name}</p>
+                      <p className="text-xs text-muted mt-0.5">{c.description}</p>
+                      {themeColor === c.id && (
+                        <p className="text-[11px] font-bold text-brand mt-2">
+                          ✓ Selecionada
+                        </p>
+                      )}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="rounded-xl bg-brand px-8 py-3.5 font-bold text-white hover:bg-brand-dark disabled:opacity-60"
+                  >
+                    {saving ? "Salvando…" : "Salvar cores e aplicar na home"}
+                  </button>
+                  <a
+                    href="/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center justify-center rounded-xl border border-border bg-white px-6 py-3.5 text-sm font-semibold"
                   >
                     Abrir home →
                   </a>

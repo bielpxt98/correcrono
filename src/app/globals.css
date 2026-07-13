@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  --demo-banner-h: 0px;
   --background: #0b0c10;
   --foreground: #f8fafc;
   --brand: #ff4d00;

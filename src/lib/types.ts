@@ -18,6 +18,7 @@ export type EventRow = {
   /** Visual da home */
   theme_layout?: string;
   theme_font?: string;
+  theme_color?: string;
   created_at: string;
   updated_at?: string;
 };
