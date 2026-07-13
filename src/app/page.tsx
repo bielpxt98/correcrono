@@ -127,21 +127,8 @@ export default function HomePage() {
             </div>
           </section>
 
-          {/* Contatos */}
-          <section className="mx-auto w-full max-w-6xl px-4 pb-24 md:pb-16">
-            <div className="rounded-3xl border border-border bg-card p-6 md:p-8">
-              <h2 className="text-xl font-bold mb-1">Contatos</h2>
-              <p className="text-xs text-muted mb-6">
-                * Demonstração — contatos fictícios
-              </p>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
-                <ContactMini label="E-mail" value="contato@corridadacidade.demo" />
-                <ContactMini label="WhatsApp" value="(11) 98765-4321" />
-                <ContactMini label="Instagram" value="@corridadacidade" />
-                <ContactMini label="YouTube" value="Corrida da Cidade" />
-              </div>
-            </div>
-          </section>
+          {/* Contatos (editáveis no admin) */}
+          <ContactsSection event={event} />
 
           {canBuy && (
             <div className="fixed bottom-0 inset-x-0 z-40 border-t border-border bg-card/95 backdrop-blur p-3 md:hidden">
@@ -226,11 +213,169 @@ export default function HomePage() {
   );
 }
 
-function ContactMini({ label, value }: { label: string; value: string }) {
+function ContactsSection({ event }: { event: EventPublic }) {
+  const items: { label: string; value: string; href?: string }[] = [];
+
+  if (event.contact_email) {
+    items.push({
+      label: "E-mail",
+      value: event.contact_email,
+      href: `mailto:${event.contact_email}`,
+    });
+  }
+  if (event.contact_whatsapp) {
+    const digits = event.contact_whatsapp.replace(/\D/g, "");
+    items.push({
+      label: "WhatsApp",
+      value: formatPhone(event.contact_whatsapp),
+      href: `https://wa.me/55${digits}`,
+    });
+  }
+  if (event.contact_phone) {
+    items.push({
+      label: "Telefone",
+      value: formatPhone(event.contact_phone),
+      href: `tel:${event.contact_phone.replace(/\D/g, "")}`,
+    });
+  }
+  if (event.contact_instagram) {
+    const ig = event.contact_instagram.replace(/^@/, "");
+    const href = event.contact_instagram.startsWith("http")
+      ? event.contact_instagram
+      : `https://instagram.com/${ig}`;
+    items.push({
+      label: "Instagram",
+      value: event.contact_instagram.startsWith("@")
+        ? event.contact_instagram
+        : `@${ig}`,
+      href,
+    });
+  }
+  if (event.contact_facebook) {
+    items.push({
+      label: "Facebook",
+      value: event.contact_facebook,
+      href: event.contact_facebook.startsWith("http")
+        ? event.contact_facebook
+        : `https://facebook.com/${event.contact_facebook}`,
+    });
+  }
+  if (event.contact_youtube) {
+    items.push({
+      label: "YouTube",
+      value: event.contact_youtube,
+      href: event.contact_youtube.startsWith("http")
+        ? event.contact_youtube
+        : `https://youtube.com/${event.contact_youtube}`,
+    });
+  }
+  if (event.contact_tiktok) {
+    const tk = event.contact_tiktok.replace(/^@/, "");
+    items.push({
+      label: "TikTok",
+      value: event.contact_tiktok.startsWith("@")
+        ? event.contact_tiktok
+        : `@${tk}`,
+      href: event.contact_tiktok.startsWith("http")
+        ? event.contact_tiktok
+        : `https://www.tiktok.com/@${tk}`,
+    });
+  }
+  if (event.contact_kit_email) {
+    items.push({
+      label: "Kit / retirada",
+      value: event.contact_kit_email,
+      href: `mailto:${event.contact_kit_email}`,
+    });
+  }
+
+  const hasTiming = Boolean(event.contact_timing_url?.trim());
+  const hasAnything = items.length > 0 || hasTiming || event.contact_extra;
+
+  if (!hasAnything) {
+    return (
+      <section className="mx-auto w-full max-w-6xl px-4 pb-24 md:pb-16">
+        <div className="rounded-3xl border border-border bg-card p-6 text-sm text-muted">
+          Contatos em breve. O organizador preenche na aba{" "}
+          <strong>Contatos</strong> do painel.
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <div className="rounded-xl border border-border bg-card-2 px-3 py-3">
-      <p className="text-[11px] text-muted">{label}</p>
-      <p className="font-medium mt-0.5 break-all">{value}</p>
-    </div>
+    <section className="mx-auto w-full max-w-6xl px-4 pb-24 md:pb-16">
+      <div className="rounded-3xl border border-border bg-card p-6 md:p-8">
+        <h2 className="text-xl font-bold mb-1">Contatos</h2>
+        <p className="text-sm text-muted mb-6">
+          Fale com a organização · redes e cronometragem
+        </p>
+
+        {hasTiming && (
+          <a
+            href={event.contact_timing_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-2xl border-2 border-brand/40 bg-brand/10 px-5 py-4 hover:bg-brand/15 transition"
+          >
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-brand-soft">
+                Cronometragem · percursos · resultados
+              </p>
+              <p className="font-bold text-lg mt-0.5">
+                {event.contact_timing_label || "Ver tabela / site oficial"}
+              </p>
+            </div>
+            <span className="inline-flex rounded-full bg-brand px-4 py-2 text-sm font-bold text-white shrink-0">
+              Abrir site →
+            </span>
+          </a>
+        )}
+
+        {items.length > 0 && (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+            {items.map((it) =>
+              it.href ? (
+                <a
+                  key={it.label + it.value}
+                  href={it.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-xl border border-border bg-card-2 px-3 py-3 hover:border-brand/50 transition"
+                >
+                  <p className="text-[11px] text-muted">{it.label}</p>
+                  <p className="font-medium mt-0.5 break-all">{it.value}</p>
+                </a>
+              ) : (
+                <div
+                  key={it.label + it.value}
+                  className="rounded-xl border border-border bg-card-2 px-3 py-3"
+                >
+                  <p className="text-[11px] text-muted">{it.label}</p>
+                  <p className="font-medium mt-0.5 break-all">{it.value}</p>
+                </div>
+              )
+            )}
+          </div>
+        )}
+
+        {event.contact_extra && (
+          <p className="mt-5 text-sm text-muted leading-relaxed whitespace-pre-line">
+            {event.contact_extra}
+          </p>
+        )}
+      </div>
+    </section>
   );
+}
+
+function formatPhone(raw: string): string {
+  const d = raw.replace(/\D/g, "");
+  if (d.length === 11) {
+    return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+  }
+  if (d.length === 10) {
+    return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+  }
+  return raw;
 }

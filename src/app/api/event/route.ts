@@ -66,6 +66,17 @@ const updateSchema = z.object({
   theme_layout: z.string().optional(),
   theme_font: z.string().optional(),
   theme_color: z.string().optional(),
+  contact_email: z.string().max(200).optional(),
+  contact_whatsapp: z.string().max(40).optional(),
+  contact_phone: z.string().max(40).optional(),
+  contact_instagram: z.string().max(120).optional(),
+  contact_facebook: z.string().max(200).optional(),
+  contact_youtube: z.string().max(200).optional(),
+  contact_tiktok: z.string().max(120).optional(),
+  contact_timing_url: z.string().max(500).optional(),
+  contact_timing_label: z.string().max(120).optional(),
+  contact_kit_email: z.string().max(200).optional(),
+  contact_extra: z.string().max(500).optional(),
 });
 
 export async function PUT(req: NextRequest) {
@@ -102,6 +113,21 @@ export async function PUT(req: NextRequest) {
   const theme_layout = resolveLayout(body.theme_layout);
   const theme_font = resolveFont(body.theme_font);
   const theme_color = resolveColor(body.theme_color);
+  const contacts = {
+    contact_email: (body.contact_email ?? "").trim(),
+    contact_whatsapp: (body.contact_whatsapp ?? "").trim(),
+    contact_phone: (body.contact_phone ?? "").trim(),
+    contact_instagram: (body.contact_instagram ?? "").trim(),
+    contact_facebook: (body.contact_facebook ?? "").trim(),
+    contact_youtube: (body.contact_youtube ?? "").trim(),
+    contact_tiktok: (body.contact_tiktok ?? "").trim(),
+    contact_timing_url: (body.contact_timing_url ?? "").trim(),
+    contact_timing_label:
+      (body.contact_timing_label ?? "").trim() ||
+      "Cronometragem e percursos",
+    contact_kit_email: (body.contact_kit_email ?? "").trim(),
+    contact_extra: (body.contact_extra ?? "").trim(),
+  };
   const categories = body.categories.map((c) => c.trim()).filter(Boolean);
   const shirt_sizes = body.shirt_sizes.map((s) => s.trim()).filter(Boolean);
   if (categories.length === 0) {
@@ -136,6 +162,7 @@ export async function PUT(req: NextRequest) {
       theme_layout,
       theme_font,
       theme_color,
+      ...contacts,
       cover_image_url:
         body.cover_image_url === undefined
           ? current.cover_image_url
@@ -151,7 +178,7 @@ export async function PUT(req: NextRequest) {
       demo: true,
       event: next,
       message:
-        "Salvo com sucesso! Abra a home e atualize a página (F5) para ver cores e layout.",
+        "Salvo com sucesso! Abra a home e atualize a página (F5) para ver as mudanças.",
     });
   }
 
@@ -184,6 +211,7 @@ export async function PUT(req: NextRequest) {
         theme_layout,
         theme_font,
         theme_color,
+        ...contacts,
         cover_image_url:
           body.cover_image_url === undefined
             ? current.cover_image_url

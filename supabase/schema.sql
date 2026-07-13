@@ -47,6 +47,17 @@ alter table public.events add column if not exists payment_notes text;
 alter table public.events add column if not exists theme_layout text not null default 'bilheteria';
 alter table public.events add column if not exists theme_font text not null default 'geist';
 alter table public.events add column if not exists theme_color text not null default 'laranja';
+alter table public.events add column if not exists contact_email text default '';
+alter table public.events add column if not exists contact_whatsapp text default '';
+alter table public.events add column if not exists contact_phone text default '';
+alter table public.events add column if not exists contact_instagram text default '';
+alter table public.events add column if not exists contact_facebook text default '';
+alter table public.events add column if not exists contact_youtube text default '';
+alter table public.events add column if not exists contact_tiktok text default '';
+alter table public.events add column if not exists contact_timing_url text default '';
+alter table public.events add column if not exists contact_timing_label text default 'Cronometragem e percursos';
+alter table public.events add column if not exists contact_kit_email text default '';
+alter table public.events add column if not exists contact_extra text default '';
 
 -- Galeria de imagens do evento
 create table if not exists public.event_images (

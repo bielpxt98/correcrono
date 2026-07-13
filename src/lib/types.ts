@@ -19,6 +19,19 @@ export type EventRow = {
   theme_layout?: string;
   theme_font?: string;
   theme_color?: string;
+  /** Contatos públicos (editáveis no admin) */
+  contact_email?: string;
+  contact_whatsapp?: string;
+  contact_phone?: string;
+  contact_instagram?: string;
+  contact_facebook?: string;
+  contact_youtube?: string;
+  contact_tiktok?: string;
+  /** Site de cronometragem / resultados / percursos */
+  contact_timing_url?: string;
+  contact_timing_label?: string;
+  contact_kit_email?: string;
+  contact_extra?: string;
   created_at: string;
   updated_at?: string;
 };

@@ -2,6 +2,10 @@
 
 import { FormEvent, useCallback, useState } from "react";
 import * as XLSX from "xlsx";
+import {
+  AdminContactsTab,
+  type ContactForm,
+} from "@/components/AdminContactsTab";
 import { AdminCouponsTab } from "@/components/AdminCouponsTab";
 import { AdminPaymentTab } from "@/components/AdminPaymentTab";
 import { LayoutWirePreview } from "@/components/LayoutWirePreview";
@@ -29,6 +33,7 @@ type Tab =
   | "evento"
   | "visual"
   | "cores"
+  | "contatos"
   | "fotos"
   | "recebimento"
   | "cupons"
@@ -87,6 +92,19 @@ export default function AdminPage() {
   const [themeLayout, setThemeLayout] = useState<LayoutId>("bilheteria");
   const [themeFont, setThemeFont] = useState<FontId>("geist");
   const [themeColor, setThemeColor] = useState<ColorId>("laranja");
+  const [contacts, setContacts] = useState<ContactForm>({
+    contact_email: "",
+    contact_whatsapp: "",
+    contact_phone: "",
+    contact_instagram: "",
+    contact_facebook: "",
+    contact_youtube: "",
+    contact_tiktok: "",
+    contact_timing_url: "",
+    contact_timing_label: "Cronometragem e percursos",
+    contact_kit_email: "",
+    contact_extra: "",
+  });
 
   function fillForm(ev: EventPublic) {
     setEvent(ev);
@@ -105,6 +123,20 @@ export default function AdminPage() {
     setThemeLayout(resolveLayout(ev.theme_layout));
     setThemeFont(resolveFont(ev.theme_font));
     setThemeColor(resolveColor(ev.theme_color));
+    setContacts({
+      contact_email: ev.contact_email || "",
+      contact_whatsapp: ev.contact_whatsapp || "",
+      contact_phone: ev.contact_phone || "",
+      contact_instagram: ev.contact_instagram || "",
+      contact_facebook: ev.contact_facebook || "",
+      contact_youtube: ev.contact_youtube || "",
+      contact_tiktok: ev.contact_tiktok || "",
+      contact_timing_url: ev.contact_timing_url || "",
+      contact_timing_label:
+        ev.contact_timing_label || "Cronometragem e percursos",
+      contact_kit_email: ev.contact_kit_email || "",
+      contact_extra: ev.contact_extra || "",
+    });
   }
 
   const loadAll = useCallback(
@@ -160,8 +192,11 @@ export default function AdminPage() {
     [q, filterStatus, filterCategory, filterShirt]
   );
 
-  async function saveEvent(e: FormEvent) {
-    e.preventDefault();
+  async function saveEvent(
+    e?: FormEvent,
+    contactsOverride?: ContactForm
+  ) {
+    e?.preventDefault();
     setSaving(true);
     setMsg(null);
     setError(null);
@@ -185,6 +220,8 @@ export default function AdminPage() {
       setSaving(false);
       return;
     }
+
+    const c = contactsOverride || contacts;
 
     try {
       const price = reaisToCents(priceInput);
@@ -211,6 +248,7 @@ export default function AdminPage() {
           theme_layout: resolveLayout(themeLayout),
           theme_font: resolveFont(themeFont),
           theme_color: resolveColor(themeColor),
+          ...c,
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -223,13 +261,12 @@ export default function AdminPage() {
       showSuccess(
         "✓ Salvo com sucesso!",
         data.message ||
-          "Alterações gravadas. Abra a home e aperte F5 para ver o novo layout."
+          "Alterações gravadas. Abra a home e aperte F5 para conferir."
       );
     } catch (err) {
       const message = err instanceof Error ? err.message : "Erro ao salvar";
       setError(message);
       setSuccessModal(null);
-      // Confirmação também no erro, para o botão não “sumir” sem feedback
       window.alert(`Não foi possível salvar:\n\n${message}`);
     } finally {
       setSaving(false);
@@ -420,14 +457,14 @@ export default function AdminPage() {
           >
             <h1 className="text-xl font-bold">Entrar</h1>
             <p className="text-sm text-muted">
-              Na demonstração a senha é <strong>demo</strong>. Depois, será a do{" "}
-              <strong>ADMIN_PASSWORD</strong>.
+              Digite a senha do organizador (definida no servidor em{" "}
+              <strong>ADMIN_PASSWORD</strong>).
             </p>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="demo"
+              placeholder="Senha do painel"
               className="w-full rounded-xl border border-border px-3 py-2.5"
               autoFocus
             />
@@ -450,10 +487,11 @@ export default function AdminPage() {
                   ["evento", "1. Dados"],
                   ["visual", "2. Layout"],
                   ["cores", "3. Cores"],
-                  ["fotos", "4. Fotos"],
-                  ["recebimento", "5. Recebimento"],
-                  ["cupons", "6. Cupons"],
-                  ["inscritos", "7. Inscritos"],
+                  ["contatos", "4. Contatos"],
+                  ["fotos", "5. Fotos"],
+                  ["recebimento", "6. Recebimento"],
+                  ["cupons", "7. Cupons"],
+                  ["inscritos", "8. Inscritos"],
                 ] as const
               ).map(([id, label]) => (
                 <button
@@ -684,7 +722,7 @@ export default function AdminPage() {
 
             {tab === "visual" && (
               <form
-                onSubmit={saveEvent}
+                onSubmit={(e) => void saveEvent(e)}
                 className="rounded-2xl border border-border bg-card p-5 md:p-8 space-y-6 shadow-sm"
               >
                 <div>
@@ -800,9 +838,21 @@ export default function AdminPage() {
               </form>
             )}
 
+            {tab === "contatos" && (
+              <AdminContactsTab
+                event={event}
+                password={password}
+                saving={saving}
+                onSave={(c) => {
+                  setContacts(c);
+                  void saveEvent(undefined, c);
+                }}
+              />
+            )}
+
             {tab === "cores" && (
               <form
-                onSubmit={saveEvent}
+                onSubmit={(e) => void saveEvent(e)}
                 className="rounded-2xl border border-border bg-card p-5 md:p-8 space-y-6 shadow-sm"
               >
                 <div>
@@ -883,7 +933,7 @@ export default function AdminPage() {
 
             {tab === "evento" && (
               <form
-                onSubmit={saveEvent}
+                onSubmit={(e) => void saveEvent(e)}
                 className="rounded-2xl border border-border bg-card p-5 md:p-8 space-y-5 shadow-sm"
               >
                 <div>

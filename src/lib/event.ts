@@ -20,6 +20,19 @@ function normalizeEvent(row: Record<string, unknown>): EventRow {
     theme_layout: String(row.theme_layout ?? "bilheteria"),
     theme_font: String(row.theme_font ?? "geist"),
     theme_color: String(row.theme_color ?? "laranja"),
+    contact_email: String(row.contact_email ?? ""),
+    contact_whatsapp: String(row.contact_whatsapp ?? ""),
+    contact_phone: String(row.contact_phone ?? ""),
+    contact_instagram: String(row.contact_instagram ?? ""),
+    contact_facebook: String(row.contact_facebook ?? ""),
+    contact_youtube: String(row.contact_youtube ?? ""),
+    contact_tiktok: String(row.contact_tiktok ?? ""),
+    contact_timing_url: String(row.contact_timing_url ?? ""),
+    contact_timing_label: String(
+      row.contact_timing_label ?? "Cronometragem e percursos"
+    ),
+    contact_kit_email: String(row.contact_kit_email ?? ""),
+    contact_extra: String(row.contact_extra ?? ""),
     created_at: String(row.created_at ?? ""),
     updated_at: row.updated_at ? String(row.updated_at) : undefined,
   };

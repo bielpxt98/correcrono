@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       {
         error: isDemoMode()
-          ? 'Senha da demonstração: digite "demo"'
+          ? "Senha incorreta. Use a senha do painel (ADMIN_PASSWORD)."
           : "Não autorizado.",
       },
       { status: 401 }

@@ -126,7 +126,7 @@ function Content() {
             />
           </div>
           <p className="text-center text-[11px] text-amber-300/90">
-            Demonstração — QR fictício (sem cobrança real)
+            Pagamento simulado até configurar o gateway
           </p>
 
           <div className="rounded-xl bg-card-2 border border-border p-3">
@@ -160,7 +160,7 @@ function Content() {
         >
           <p className="text-sm font-medium">Dados do cartão de crédito</p>
           <p className="text-[11px] text-amber-300/90 -mt-2">
-            Demonstração — não processa cobrança real
+            Simulado até configurar o gateway de pagamento
           </p>
 
           <div>
