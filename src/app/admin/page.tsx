@@ -7,6 +7,7 @@ import {
   type ContactForm,
 } from "@/components/AdminContactsTab";
 import { AdminCouponsTab } from "@/components/AdminCouponsTab";
+import { AdminPasswordTab } from "@/components/AdminPasswordTab";
 import { AdminPaymentTab } from "@/components/AdminPaymentTab";
 import { LayoutWirePreview } from "@/components/LayoutWirePreview";
 import { centsToReaisInput, formatBRL, reaisToCents } from "@/lib/format";
@@ -37,6 +38,7 @@ type Tab =
   | "fotos"
   | "recebimento"
   | "cupons"
+  | "senha"
   | "inscritos";
 
 const STATUS_LABEL: Record<string, string> = {
@@ -457,14 +459,15 @@ export default function AdminPage() {
           >
             <h1 className="text-xl font-bold">Entrar</h1>
             <p className="text-sm text-muted">
-              Digite a senha do organizador (definida no servidor em{" "}
-              <strong>ADMIN_PASSWORD</strong>).
+              Senha padrão inicial: <strong>admin123</strong>
+              <br />
+              Depois você pode trocar na aba <strong>Senha</strong>.
             </p>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Senha do painel"
+              placeholder="admin123"
               className="w-full rounded-xl border border-border px-3 py-2.5"
               autoFocus
             />
@@ -491,7 +494,8 @@ export default function AdminPage() {
                   ["fotos", "5. Fotos"],
                   ["recebimento", "6. Recebimento"],
                   ["cupons", "7. Cupons"],
-                  ["inscritos", "8. Inscritos"],
+                  ["senha", "8. Senha"],
+                  ["inscritos", "9. Inscritos"],
                 ] as const
               ).map(([id, label]) => (
                 <button
@@ -1193,6 +1197,20 @@ export default function AdminPage() {
                   setError(e);
                   if (m && !e) {
                     showSuccess("Cupom atualizado!", m);
+                  }
+                }}
+              />
+            )}
+
+            {tab === "senha" && (
+              <AdminPasswordTab
+                password={password}
+                onPasswordChanged={(np) => setPassword(np)}
+                onMessage={(m, e) => {
+                  setMsg(m);
+                  setError(e);
+                  if (m && !e) {
+                    showSuccess("Senha alterada!", m);
                   }
                 }}
               />

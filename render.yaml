@@ -14,6 +14,6 @@ services:
       - key: DEMO_MODE
         value: "true"
       - key: ADMIN_PASSWORD
-        value: demo
+        value: admin123
       - key: NEXT_PUBLIC_APP_URL
         sync: false

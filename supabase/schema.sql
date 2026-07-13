@@ -58,6 +58,7 @@ alter table public.events add column if not exists contact_timing_url text defau
 alter table public.events add column if not exists contact_timing_label text default 'Cronometragem e percursos';
 alter table public.events add column if not exists contact_kit_email text default '';
 alter table public.events add column if not exists contact_extra text default '';
+alter table public.events add column if not exists admin_password_hash text;
 
 -- Galeria de imagens do evento
 create table if not exists public.event_images (
