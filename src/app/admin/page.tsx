@@ -16,6 +16,7 @@ import type { EventImage, EventPublic, RegistrationRow } from "@/lib/types";
 type Tab =
   | "resumo"
   | "evento"
+  | "visual"
   | "fotos"
   | "recebimento"
   | "cupons"
@@ -358,10 +359,11 @@ export default function AdminPage() {
                 [
                   ["resumo", "0. Resumo"],
                   ["evento", "1. Dados da corrida"],
-                  ["fotos", "2. Fotos"],
-                  ["recebimento", "3. Recebimento"],
-                  ["cupons", "4. Cupons"],
-                  ["inscritos", "5. Inscritos"],
+                  ["visual", "2. Visual ★"],
+                  ["fotos", "3. Fotos"],
+                  ["recebimento", "4. Recebimento"],
+                  ["cupons", "5. Cupons"],
+                  ["inscritos", "6. Inscritos"],
                 ] as const
               ).map(([id, label]) => (
                 <button
@@ -590,6 +592,115 @@ export default function AdminPage() {
               </div>
             )}
 
+            {tab === "visual" && (
+              <form
+                onSubmit={saveEvent}
+                className="rounded-2xl border border-border bg-card p-5 md:p-8 space-y-6 shadow-sm"
+              >
+                <div>
+                  <h2 className="text-2xl font-black tracking-tight">
+                    Visual da home
+                  </h2>
+                  <p className="text-sm text-muted mt-1">
+                    Aqui o Felipe escolhe o <strong>layout</strong> (cores) e a{" "}
+                    <strong>fonte</strong> das letras. Depois salva e abre a
+                    home para ver.
+                  </p>
+                </div>
+
+                <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-950">
+                  1) Escolha layout e fonte abaixo → 2) clique{" "}
+                  <strong>Salvar visual</strong> → 3) abra{" "}
+                  <a href="/" className="font-bold underline" target="_blank" rel="noreferrer">
+                    a home do site
+                  </a>{" "}
+                  (F5 se já estiver aberta).
+                </div>
+
+                <div>
+                  <p className="text-base font-bold mb-3">1. Layout (cores)</p>
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {LAYOUTS.map((l) => (
+                      <button
+                        key={l.id}
+                        type="button"
+                        onClick={() => setThemeLayout(l.id)}
+                        className={
+                          themeLayout === l.id
+                            ? "rounded-2xl border-2 border-brand p-4 text-left bg-orange-50 shadow-md ring-2 ring-brand/30"
+                            : "rounded-2xl border border-border p-4 text-left bg-white hover:border-orange-300"
+                        }
+                      >
+                        <div
+                          className="h-14 rounded-xl mb-3 border border-black/5"
+                          style={{ background: l.preview }}
+                        />
+                        <p className="font-bold">{l.name}</p>
+                        <p className="text-xs text-muted mt-1 leading-snug">
+                          {l.description}
+                        </p>
+                        {themeLayout === l.id && (
+                          <p className="text-[11px] font-bold text-brand mt-2">
+                            ✓ Selecionado
+                          </p>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-base font-bold mb-3">2. Fonte das letras</p>
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {FONTS.map((f) => (
+                      <button
+                        key={f.id}
+                        type="button"
+                        onClick={() => setThemeFont(f.id)}
+                        className={
+                          themeFont === f.id
+                            ? "rounded-2xl border-2 border-brand p-4 text-left bg-orange-50 ring-2 ring-brand/30"
+                            : "rounded-2xl border border-border p-4 text-left bg-white hover:border-orange-300"
+                        }
+                      >
+                        <p
+                          className="text-2xl font-bold"
+                          style={{ fontFamily: f.cssVar }}
+                        >
+                          Aa Bb Cc
+                        </p>
+                        <p className="font-semibold mt-2">{f.name}</p>
+                        <p className="text-xs text-muted mt-0.5">{f.description}</p>
+                        {themeFont === f.id && (
+                          <p className="text-[11px] font-bold text-brand mt-2">
+                            ✓ Selecionado
+                          </p>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="rounded-xl bg-brand px-8 py-3.5 font-bold text-white hover:bg-brand-dark disabled:opacity-60 text-base"
+                  >
+                    {saving ? "Salvando…" : "Salvar visual e aplicar na home"}
+                  </button>
+                  <a
+                    href="/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center justify-center rounded-xl border border-border bg-white px-6 py-3.5 text-sm font-semibold hover:bg-slate-50"
+                  >
+                    Abrir home →
+                  </a>
+                </div>
+              </form>
+            )}
+
             {tab === "evento" && (
               <form
                 onSubmit={saveEvent}
@@ -602,80 +713,18 @@ export default function AdminPage() {
                   </p>
                 </div>
 
-                {/* Layout + fonte da home */}
-                <div className="rounded-2xl border border-border bg-slate-50 p-4 space-y-4">
-                  <div>
-                    <h3 className="font-bold text-sm">Visual da home</h3>
-                    <p className="text-xs text-muted mt-0.5">
-                      Escolha o layout e a fonte das letras. Depois clique em
-                      salvar e abra o site.
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-sm font-medium mb-2">Layout</p>
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                      {LAYOUTS.map((l) => (
-                        <button
-                          key={l.id}
-                          type="button"
-                          onClick={() => setThemeLayout(l.id)}
-                          className={
-                            themeLayout === l.id
-                              ? "rounded-xl border-2 border-brand p-3 text-left bg-white shadow-sm"
-                              : "rounded-xl border border-border p-3 text-left bg-white hover:border-orange-300"
-                          }
-                        >
-                          <div
-                            className="h-10 rounded-lg mb-2"
-                            style={{ background: l.preview }}
-                          />
-                          <p className="font-semibold text-sm">{l.name}</p>
-                          <p className="text-[11px] text-muted mt-0.5 leading-snug">
-                            {l.description}
-                          </p>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <p className="text-sm font-medium mb-2">Fonte das letras</p>
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                      {FONTS.map((f) => (
-                        <button
-                          key={f.id}
-                          type="button"
-                          onClick={() => setThemeFont(f.id)}
-                          className={
-                            themeFont === f.id
-                              ? "rounded-xl border-2 border-brand p-3 text-left bg-white"
-                              : "rounded-xl border border-border p-3 text-left bg-white hover:border-orange-300"
-                          }
-                        >
-                          <p
-                            className="font-bold text-base"
-                            style={{ fontFamily: f.cssVar }}
-                          >
-                            Aa {f.name}
-                          </p>
-                          <p className="text-[11px] text-muted mt-1">
-                            {f.description}
-                          </p>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <a
-                    href="/"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex text-sm font-semibold text-brand hover:underline"
-                  >
-                    Ver site em nova aba →
-                  </a>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setTab("visual")}
+                  className="w-full rounded-2xl border-2 border-dashed border-orange-300 bg-orange-50 px-4 py-3 text-left hover:bg-orange-100 transition"
+                >
+                  <p className="font-bold text-orange-950">
+                    🎨 Quer mudar cores e fonte da home?
+                  </p>
+                  <p className="text-sm text-orange-900/80 mt-0.5">
+                    Abra a aba <strong>2. Visual ★</strong> — layout + letras
+                  </p>
+                </button>
 
                 <Field label="Nome da corrida *">
                   <input
