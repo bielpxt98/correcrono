@@ -48,6 +48,16 @@ export default function AdminPage() {
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [successModal, setSuccessModal] = useState<{
+    title: string;
+    message: string;
+  } | null>(null);
+
+  function showSuccess(title: string, message: string) {
+    setMsg(message);
+    setError(null);
+    setSuccessModal({ title, message });
+  }
 
   // Form estado do evento
   const [name, setName] = useState("");
@@ -189,7 +199,11 @@ export default function AdminPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Falha ao salvar");
       fillForm(data.event);
-      setMsg("Salvo! Layout e fonte da home já atualizados — abra o site para ver.");
+      showSuccess(
+        "Alterações salvas!",
+        data.message ||
+          "Os dados da corrida e o visual da home foram atualizados. Abra o site (F5) para conferir."
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao salvar");
     } finally {
@@ -216,7 +230,10 @@ export default function AdminPage() {
         if (!res.ok) throw new Error(data.error || "Falha no upload");
         if (data.event) fillForm(data.event);
       }
-      setMsg("Foto(s) enviada(s)! Já aparecem no site.");
+      showSuccess(
+        "Fotos enviadas!",
+        "As imagens já estão no site. Abra a home e confira a galeria/capa."
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro no upload");
     } finally {
@@ -239,7 +256,7 @@ export default function AdminPage() {
       return;
     }
     if (data.event) fillForm(data.event);
-    setMsg("Capa atualizada no site.");
+    showSuccess("Capa atualizada!", "A foto de capa do site foi alterada.");
   }
 
   async function removeImage(img: EventImage) {
@@ -254,7 +271,7 @@ export default function AdminPage() {
       return;
     }
     if (data.event) fillForm(data.event);
-    setMsg("Foto removida.");
+    showSuccess("Foto removida!", "A imagem saiu da galeria do site.");
   }
 
   async function updateStatus(id: string, status: RegistrationRow["status"]) {
@@ -301,6 +318,53 @@ export default function AdminPage() {
 
   return (
     <div className="admin-theme min-h-full">
+      {/* Modal de confirmação ao salvar */}
+      {successModal && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="success-title"
+          onClick={() => setSuccessModal(null)}
+        >
+          <div
+            className="w-full max-w-md rounded-3xl bg-white shadow-2xl border border-border p-6 md:p-8 text-center animate-[fadeIn_0.2s_ease]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-3xl">
+              ✓
+            </div>
+            <h2
+              id="success-title"
+              className="text-xl font-black text-slate-900 tracking-tight"
+            >
+              {successModal.title}
+            </h2>
+            <p className="mt-3 text-sm text-slate-600 leading-relaxed">
+              {successModal.message}
+            </p>
+            <div className="mt-6 flex flex-col sm:flex-row gap-2 justify-center">
+              <button
+                type="button"
+                onClick={() => setSuccessModal(null)}
+                className="rounded-xl bg-brand px-6 py-3 font-bold text-white hover:bg-brand-dark"
+              >
+                Entendi
+              </button>
+              <a
+                href="/"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center justify-center rounded-xl border border-border px-6 py-3 text-sm font-semibold hover:bg-slate-50"
+                onClick={() => setSuccessModal(null)}
+              >
+                Ver site →
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
       <header className="border-b border-border bg-card sticky top-0 z-20">
         <div className="mx-auto max-w-5xl px-4 py-3 flex items-center justify-between gap-3">
           <div>
@@ -947,6 +1011,9 @@ export default function AdminPage() {
                 onMessage={(m, e) => {
                   setMsg(m);
                   setError(e);
+                  if (m && !e) {
+                    showSuccess("Recebimento salvo!", m);
+                  }
                 }}
               />
             )}
@@ -958,6 +1025,9 @@ export default function AdminPage() {
                 onMessage={(m, e) => {
                   setMsg(m);
                   setError(e);
+                  if (m && !e) {
+                    showSuccess("Cupom atualizado!", m);
+                  }
                 }}
               />
             )}
