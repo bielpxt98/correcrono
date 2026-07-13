@@ -809,7 +809,7 @@ export default function AdminPage() {
                       >
                         <p
                           className="text-2xl font-bold"
-                          style={{ fontFamily: f.cssVar }}
+                          style={{ fontFamily: f.family }}
                         >
                           Aa Bb Cc
                         </p>

@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { formatDateLongBR } from "@/lib/format";
 import {
   colorVarsStyle,
+  getFontFamily,
   resolveColor,
   resolveFont,
   resolveLayout,
@@ -21,6 +22,7 @@ export default function HomePage() {
   const layout = resolveLayout(event?.theme_layout);
   const font = resolveFont(event?.theme_font);
   const color = resolveColor(event?.theme_color);
+  const fontFamily = getFontFamily(font);
 
   useEffect(() => {
     fetch("/api/event")
@@ -60,7 +62,12 @@ export default function HomePage() {
       data-layout={layout}
       data-font={font}
       data-color={color}
-      style={colorVarsStyle(color)}
+      style={{
+        ...colorVarsStyle(color),
+        fontFamily,
+        // CSS var para títulos usarem a mesma fonte
+        ["--home-font" as string]: fontFamily,
+      }}
     >
       {loading && (
         <>

@@ -37,6 +37,8 @@ export type FontOption = {
   name: string;
   description: string;
   cssVar: string;
+  /** Valor completo para font-family inline (mais confiável na home) */
+  family: string;
 };
 
 export type ColorOption = {
@@ -101,13 +103,54 @@ export const LAYOUTS: LayoutOption[] = [
 ];
 
 export const FONTS: FontOption[] = [
-  { id: "geist", name: "Geist", description: "Padrão moderno", cssVar: "var(--font-geist-sans)" },
-  { id: "montserrat", name: "Montserrat", description: "Esportiva", cssVar: "var(--font-montserrat)" },
-  { id: "oswald", name: "Oswald", description: "Títulos fortes", cssVar: "var(--font-oswald)" },
-  { id: "playfair", name: "Playfair", description: "Elegante", cssVar: "var(--font-playfair)" },
-  { id: "space", name: "Space Grotesk", description: "Tech", cssVar: "var(--font-space)" },
-  { id: "roboto", name: "Roboto", description: "Neutra", cssVar: "var(--font-roboto)" },
+  {
+    id: "geist",
+    name: "Geist",
+    description: "Padrão moderno",
+    cssVar: "var(--font-geist-sans)",
+    family: "var(--font-geist-sans), system-ui, sans-serif",
+  },
+  {
+    id: "montserrat",
+    name: "Montserrat",
+    description: "Esportiva",
+    cssVar: "var(--font-montserrat)",
+    family: "var(--font-montserrat), 'Montserrat', system-ui, sans-serif",
+  },
+  {
+    id: "oswald",
+    name: "Oswald",
+    description: "Títulos fortes",
+    cssVar: "var(--font-oswald)",
+    family: "var(--font-oswald), 'Oswald', system-ui, sans-serif",
+  },
+  {
+    id: "playfair",
+    name: "Playfair",
+    description: "Elegante",
+    cssVar: "var(--font-playfair)",
+    family: "var(--font-playfair), 'Playfair Display', Georgia, serif",
+  },
+  {
+    id: "space",
+    name: "Space Grotesk",
+    description: "Tech",
+    cssVar: "var(--font-space)",
+    family: "var(--font-space), 'Space Grotesk', system-ui, sans-serif",
+  },
+  {
+    id: "roboto",
+    name: "Roboto",
+    description: "Neutra",
+    cssVar: "var(--font-roboto)",
+    family: "var(--font-roboto), 'Roboto', system-ui, sans-serif",
+  },
 ];
+
+export function getFontFamily(id: unknown): string {
+  const f = resolveFont(id);
+  return FONTS.find((x) => x.id === f)!.family;
+}
 
 export const COLORS: ColorOption[] = [
   {

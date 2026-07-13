@@ -75,7 +75,19 @@ export default function RootLayout({
         "h-full antialiased",
       ].join(" ")}
     >
-      <body className="min-h-full flex flex-col">
+      <body
+        className={[
+          "min-h-full flex flex-col",
+          // Garante carregamento real das fontes (não só a CSS variable)
+          geistSans.className,
+        ].join(" ")}
+      >
+        {/* Classes das fontes: força o Next a carregar todos os arquivos */}
+        <span className={`${montserrat.className} hidden`} aria-hidden />
+        <span className={`${oswald.className} hidden`} aria-hidden />
+        <span className={`${playfair.className} hidden`} aria-hidden />
+        <span className={`${space.className} hidden`} aria-hidden />
+        <span className={`${roboto.className} hidden`} aria-hidden />
         <DemoBanner />
         {children}
       </body>
