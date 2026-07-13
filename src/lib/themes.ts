@@ -1,9 +1,9 @@
 export type LayoutId =
   | "bilheteria"
-  | "light"
-  | "neon"
-  | "classic"
-  | "minimal";
+  | "poster"
+  | "vitrine"
+  | "revista"
+  | "catalogo";
 
 export type FontId =
   | "geist"
@@ -17,7 +17,11 @@ export type LayoutOption = {
   id: LayoutId;
   name: string;
   description: string;
-  preview: string; // gradient CSS for admin cards
+  /** Onde ficam as peças — para o admin entender */
+  structure: string;
+  /** Cores da mini-prévia no admin */
+  previewBg: string;
+  accent: string;
 };
 
 export type FontOption = {
@@ -25,39 +29,48 @@ export type FontOption = {
   name: string;
   description: string;
   cssVar: string;
-  className: string;
 };
 
 export const LAYOUTS: LayoutOption[] = [
   {
     id: "bilheteria",
     name: "Bilheteria",
-    description: "Escuro + laranja (estilo ingresso digital)",
-    preview: "linear-gradient(135deg,#0b0c10,#ff4d00)",
+    description: "Foto de fundo em tela cheia, título à esquerda e card de ingresso à direita.",
+    structure: "Hero foto + letreiro + card ingresso | galeria embaixo",
+    previewBg: "#0b0c10",
+    accent: "#ff4d00",
   },
   {
-    id: "light",
-    name: "Claro",
-    description: "Fundo claro, limpo e profissional",
-    preview: "linear-gradient(135deg,#f8fafc,#0ea5e9)",
+    id: "poster",
+    name: "Cartaz central",
+    description: "Letreiro e botão no centro sobre a foto. Galeria em grade embaixo.",
+    structure: "Foto full | título centro | botão | grade de fotos",
+    previewBg: "#111827",
+    accent: "#38bdf8",
   },
   {
-    id: "neon",
-    name: "Neon esporte",
-    description: "Preto com verde limão / energia de corrida",
-    preview: "linear-gradient(135deg,#050505,#a3e635)",
+    id: "vitrine",
+    name: "Vitrine de fotos",
+    description: "Faixa de fotos no topo, depois título + ingresso lado a lado.",
+    structure: "Faixa fotos | título + card | sobre + regulamento",
+    previewBg: "#f8fafc",
+    accent: "#0ea5e9",
   },
   {
-    id: "classic",
-    name: "Clássico",
-    description: "Azul-marinho e dourado (evento premium)",
-    preview: "linear-gradient(135deg,#0f172a,#d4a017)",
+    id: "revista",
+    name: "Revista",
+    description: "Título grande no topo, card de ingresso embaixo, fotos em mosaico.",
+    structure: "Letreiro top | ingresso | mosaico de fotos | textos",
+    previewBg: "#0f172a",
+    accent: "#d4a017",
   },
   {
-    id: "minimal",
-    name: "Minimal",
-    description: "Preto e branco, tipografia em destaque",
-    preview: "linear-gradient(135deg,#111,#fff)",
+    id: "catalogo",
+    name: "Catálogo",
+    description: "Ingresso em destaque no topo, fotos em colunas, textos depois.",
+    structure: "Card ingresso top | 2 colunas fotos | sobre",
+    previewBg: "#fafafa",
+    accent: "#171717",
   },
 ];
 
@@ -65,44 +78,38 @@ export const FONTS: FontOption[] = [
   {
     id: "geist",
     name: "Geist",
-    description: "Padrão moderno (atual)",
+    description: "Padrão moderno",
     cssVar: "var(--font-geist-sans)",
-    className: "font-theme-geist",
   },
   {
     id: "montserrat",
     name: "Montserrat",
-    description: "Limpa e esportiva",
+    description: "Esportiva e limpa",
     cssVar: "var(--font-montserrat)",
-    className: "font-theme-montserrat",
   },
   {
     id: "oswald",
     name: "Oswald",
-    description: "Títulos fortes de corrida",
+    description: "Títulos fortes",
     cssVar: "var(--font-oswald)",
-    className: "font-theme-oswald",
   },
   {
     id: "playfair",
     name: "Playfair",
     description: "Elegante / premium",
     cssVar: "var(--font-playfair)",
-    className: "font-theme-playfair",
   },
   {
     id: "space",
     name: "Space Grotesk",
-    description: "Tecnológica e atual",
+    description: "Tech e atual",
     cssVar: "var(--font-space)",
-    className: "font-theme-space",
   },
   {
     id: "roboto",
     name: "Roboto",
     description: "Neutra e legível",
     cssVar: "var(--font-roboto)",
-    className: "font-theme-roboto",
   },
 ];
 
@@ -115,6 +122,10 @@ export function isFontId(v: unknown): v is FontId {
 }
 
 export function resolveLayout(v: unknown): LayoutId {
+  // migra IDs antigos de cor-only
+  if (v === "light" || v === "minimal") return "vitrine";
+  if (v === "neon") return "poster";
+  if (v === "classic") return "revista";
   return isLayoutId(v) ? v : "bilheteria";
 }
 

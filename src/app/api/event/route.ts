@@ -62,7 +62,7 @@ const updateSchema = z.object({
   shirt_sizes: z.array(z.string().min(1).max(20)).min(1).max(20),
   cover_image_url: z.string().url().nullable().optional(),
   theme_layout: z
-    .enum(["bilheteria", "light", "neon", "classic", "minimal"])
+    .enum(["bilheteria", "poster", "vitrine", "revista", "catalogo"])
     .optional(),
   theme_font: z
     .enum(["geist", "montserrat", "oswald", "playfair", "space", "roboto"])

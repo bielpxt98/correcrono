@@ -4,6 +4,7 @@ import { FormEvent, useCallback, useState } from "react";
 import * as XLSX from "xlsx";
 import { AdminCouponsTab } from "@/components/AdminCouponsTab";
 import { AdminPaymentTab } from "@/components/AdminPaymentTab";
+import { LayoutWirePreview } from "@/components/LayoutWirePreview";
 import { centsToReaisInput, formatBRL, reaisToCents } from "@/lib/format";
 import type { RegistrationStats } from "@/lib/registration-stats";
 import {
@@ -663,27 +664,35 @@ export default function AdminPage() {
               >
                 <div>
                   <h2 className="text-2xl font-black tracking-tight">
-                    Visual da home
+                    Designs da home (layout)
                   </h2>
                   <p className="text-sm text-muted mt-1">
-                    Aqui o Felipe escolhe o <strong>layout</strong> (cores) e a{" "}
-                    <strong>fonte</strong> das letras. Depois salva e abre a
-                    home para ver.
+                    Como em lojas de template: cada opção{" "}
+                    <strong>muda a posição</strong> de fotos, letreiro e card de
+                    ingresso — não só a cor. Escolha, salve e veja a prévia no
+                    site.
                   </p>
                 </div>
 
                 <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-950">
-                  1) Escolha layout e fonte abaixo → 2) clique{" "}
-                  <strong>Salvar visual</strong> → 3) abra{" "}
-                  <a href="/" className="font-bold underline" target="_blank" rel="noreferrer">
-                    a home do site
+                  1) Clique em um design → 2){" "}
+                  <strong>Salvar visual</strong> → 3) abra a{" "}
+                  <a
+                    href="/"
+                    className="font-bold underline"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    home
                   </a>{" "}
-                  (F5 se já estiver aberta).
+                  e dê F5. Aparece confirmação ao salvar.
                 </div>
 
                 <div>
-                  <p className="text-base font-bold mb-3">1. Layout (cores)</p>
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <p className="text-base font-bold mb-3">
+                    1. Escolha o design (estrutura da página)
+                  </p>
+                  <div className="grid sm:grid-cols-2 gap-4">
                     {LAYOUTS.map((l) => (
                       <button
                         key={l.id}
@@ -691,21 +700,25 @@ export default function AdminPage() {
                         onClick={() => setThemeLayout(l.id)}
                         className={
                           themeLayout === l.id
-                            ? "rounded-2xl border-2 border-brand p-4 text-left bg-orange-50 shadow-md ring-2 ring-brand/30"
+                            ? "rounded-2xl border-2 border-brand p-4 text-left bg-orange-50 shadow-md ring-2 ring-brand/20"
                             : "rounded-2xl border border-border p-4 text-left bg-white hover:border-orange-300"
                         }
                       >
-                        <div
-                          className="h-14 rounded-xl mb-3 border border-black/5"
-                          style={{ background: l.preview }}
+                        <LayoutWirePreview
+                          id={l.id}
+                          accent={l.accent}
+                          bg={l.previewBg}
                         />
-                        <p className="font-bold">{l.name}</p>
+                        <p className="font-bold text-base mt-3">{l.name}</p>
                         <p className="text-xs text-muted mt-1 leading-snug">
                           {l.description}
                         </p>
+                        <p className="text-[11px] text-slate-500 mt-2 font-mono bg-slate-100 rounded-lg px-2 py-1">
+                          {l.structure}
+                        </p>
                         {themeLayout === l.id && (
                           <p className="text-[11px] font-bold text-brand mt-2">
-                            ✓ Selecionado
+                            ✓ Design selecionado
                           </p>
                         )}
                       </button>
@@ -723,7 +736,7 @@ export default function AdminPage() {
                         onClick={() => setThemeFont(f.id)}
                         className={
                           themeFont === f.id
-                            ? "rounded-2xl border-2 border-brand p-4 text-left bg-orange-50 ring-2 ring-brand/30"
+                            ? "rounded-2xl border-2 border-brand p-4 text-left bg-orange-50 ring-2 ring-brand/20"
                             : "rounded-2xl border border-border p-4 text-left bg-white hover:border-orange-300"
                         }
                       >
@@ -734,12 +747,9 @@ export default function AdminPage() {
                           Aa Bb Cc
                         </p>
                         <p className="font-semibold mt-2">{f.name}</p>
-                        <p className="text-xs text-muted mt-0.5">{f.description}</p>
-                        {themeFont === f.id && (
-                          <p className="text-[11px] font-bold text-brand mt-2">
-                            ✓ Selecionado
-                          </p>
-                        )}
+                        <p className="text-xs text-muted mt-0.5">
+                          {f.description}
+                        </p>
                       </button>
                     ))}
                   </div>

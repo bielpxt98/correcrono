@@ -99,9 +99,24 @@ button {
   font-family: var(--home-font, var(--font-geist-sans)), system-ui, sans-serif;
 }
 
-/* Bilheteria (padrão) — já usa :root */
+/* Cores por layout estrutural */
+.home-theme[data-layout="bilheteria"] {
+  /* usa :root laranja/escuro */
+}
 
-.home-theme[data-layout="light"] {
+.home-theme[data-layout="poster"] {
+  --background: #0a0a0a;
+  --foreground: #fafafa;
+  --brand: #38bdf8;
+  --brand-dark: #0ea5e9;
+  --brand-soft: #7dd3fc;
+  --card: #171717;
+  --card-2: #262626;
+  --muted: #a3a3a3;
+  --border: #333;
+}
+
+.home-theme[data-layout="vitrine"] {
   --background: #f1f5f9;
   --foreground: #0f172a;
   --brand: #0284c7;
@@ -113,19 +128,7 @@ button {
   --border: #e2e8f0;
 }
 
-.home-theme[data-layout="neon"] {
-  --background: #050505;
-  --foreground: #f4f4f5;
-  --brand: #a3e635;
-  --brand-dark: #84cc16;
-  --brand-soft: #bef264;
-  --card: #121212;
-  --card-2: #1a1a1a;
-  --muted: #a1a1aa;
-  --border: #27272a;
-}
-
-.home-theme[data-layout="classic"] {
+.home-theme[data-layout="revista"] {
   --background: #0b1220;
   --foreground: #f8fafc;
   --brand: #d4a017;
@@ -137,12 +140,12 @@ button {
   --border: #2a3f5f;
 }
 
-.home-theme[data-layout="minimal"] {
+.home-theme[data-layout="catalogo"] {
   --background: #fafafa;
   --foreground: #0a0a0a;
   --brand: #171717;
-  --brand-dark: #000000;
-  --brand-soft: #404040;
+  --brand-dark: #000;
+  --brand-soft: #525252;
   --card: #ffffff;
   --card-2: #f5f5f5;
   --muted: #737373;
