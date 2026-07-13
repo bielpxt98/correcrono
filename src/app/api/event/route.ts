@@ -5,6 +5,7 @@ import { getDemoEvent, isDemoMode, setDemoEvent } from "@/lib/demo-data";
 import { getActiveEvent } from "@/lib/event";
 import { getPaymentSettingsPublic } from "@/lib/payment-settings";
 import { getServiceSupabase, isSupabaseConfigured } from "@/lib/supabase";
+import { resolveFont, resolveLayout } from "@/lib/themes";
 
 export async function GET() {
   if (isDemoMode()) {
@@ -49,24 +50,21 @@ export async function GET() {
 
 const updateSchema = z.object({
   name: z.string().min(2).max(160),
-  description: z.string().max(8000),
-  regulations: z.string().max(12000),
+  description: z.string().max(8000).optional().default(""),
+  regulations: z.string().max(12000).optional().default(""),
   event_date: z.string().min(8),
-  start_time: z.string().min(1).max(10),
-  location: z.string().max(300),
-  city: z.string().max(120),
-  price_cents: z.number().int().min(0).max(10_000_000),
-  max_slots: z.number().int().min(1).max(100_000),
+  start_time: z.string().min(1).max(20).optional().default("07:00"),
+  location: z.string().max(300).optional().default(""),
+  city: z.string().max(120).optional().default(""),
+  price_cents: z.coerce.number().int().min(0).max(10_000_000),
+  max_slots: z.coerce.number().int().min(1).max(100_000),
   registration_open: z.boolean(),
-  categories: z.array(z.string().min(1).max(60)).min(1).max(40),
-  shirt_sizes: z.array(z.string().min(1).max(20)).min(1).max(20),
-  cover_image_url: z.string().url().nullable().optional(),
-  theme_layout: z
-    .enum(["bilheteria", "poster", "vitrine", "revista", "catalogo"])
-    .optional(),
-  theme_font: z
-    .enum(["geist", "montserrat", "oswald", "playfair", "space", "roboto"])
-    .optional(),
+  categories: z.array(z.string()).min(1).max(40),
+  shirt_sizes: z.array(z.string()).min(1).max(20),
+  cover_image_url: z.string().nullable().optional(),
+  // Aceita IDs antigos e novos; normaliza com resolveLayout/resolveFont
+  theme_layout: z.string().optional(),
+  theme_font: z.string().optional(),
 });
 
 export async function PUT(req: NextRequest) {
@@ -84,32 +82,57 @@ export async function PUT(req: NextRequest) {
 
   const parsed = updateSchema.safeParse(json);
   if (!parsed.success) {
+    const flat = parsed.error.flatten();
+    const fieldMsgs = Object.entries(flat.fieldErrors)
+      .map(([k, v]) => `${k}: ${(v || []).join(", ")}`)
+      .join(" · ");
     return NextResponse.json(
-      { error: "Dados inválidos.", details: parsed.error.flatten() },
+      {
+        error: fieldMsgs
+          ? `Dados inválidos (${fieldMsgs})`
+          : "Dados inválidos. Confira nome, data, preço, vagas e categorias.",
+        details: flat,
+      },
       { status: 400 }
     );
   }
 
   const body = parsed.data;
+  const theme_layout = resolveLayout(body.theme_layout);
+  const theme_font = resolveFont(body.theme_font);
+  const categories = body.categories.map((c) => c.trim()).filter(Boolean);
+  const shirt_sizes = body.shirt_sizes.map((s) => s.trim()).filter(Boolean);
+  if (categories.length === 0) {
+    return NextResponse.json(
+      { error: "Informe ao menos 1 categoria." },
+      { status: 400 }
+    );
+  }
+  if (shirt_sizes.length === 0) {
+    return NextResponse.json(
+      { error: "Informe ao menos 1 tamanho de camiseta." },
+      { status: 400 }
+    );
+  }
 
   if (isDemoMode()) {
     const current = getDemoEvent();
     const next = {
       ...current,
       name: body.name.trim(),
-      description: body.description.trim(),
-      regulations: body.regulations.trim(),
+      description: (body.description || "").trim(),
+      regulations: (body.regulations || "").trim(),
       event_date: body.event_date,
-      start_time: body.start_time.trim(),
-      location: body.location.trim(),
-      city: body.city.trim(),
+      start_time: (body.start_time || "07:00").trim(),
+      location: (body.location || "").trim(),
+      city: (body.city || "").trim(),
       price_cents: body.price_cents,
       max_slots: body.max_slots,
       registration_open: body.registration_open,
-      categories: body.categories.map((c) => c.trim()).filter(Boolean),
-      shirt_sizes: body.shirt_sizes.map((s) => s.trim()).filter(Boolean),
-      theme_layout: body.theme_layout ?? current.theme_layout ?? "bilheteria",
-      theme_font: body.theme_font ?? current.theme_font ?? "geist",
+      categories,
+      shirt_sizes,
+      theme_layout,
+      theme_font,
       cover_image_url:
         body.cover_image_url === undefined
           ? current.cover_image_url
@@ -124,7 +147,8 @@ export async function PUT(req: NextRequest) {
       ok: true,
       demo: true,
       event: next,
-      message: "Salvo na demonstração (some ao reiniciar o servidor).",
+      message:
+        "Salvo com sucesso! Abra a home e atualize a página (F5) para ver o novo layout.",
     });
   }
 
@@ -143,19 +167,19 @@ export async function PUT(req: NextRequest) {
       .from("events")
       .update({
         name: body.name.trim(),
-        description: body.description.trim(),
-        regulations: body.regulations.trim(),
+        description: (body.description || "").trim(),
+        regulations: (body.regulations || "").trim(),
         event_date: body.event_date,
-        start_time: body.start_time.trim(),
-        location: body.location.trim(),
-        city: body.city.trim(),
+        start_time: (body.start_time || "07:00").trim(),
+        location: (body.location || "").trim(),
+        city: (body.city || "").trim(),
         price_cents: body.price_cents,
         max_slots: body.max_slots,
         registration_open: body.registration_open,
-        categories: body.categories.map((c) => c.trim()).filter(Boolean),
-        shirt_sizes: body.shirt_sizes.map((s) => s.trim()).filter(Boolean),
-        theme_layout: body.theme_layout ?? current.theme_layout ?? "bilheteria",
-        theme_font: body.theme_font ?? current.theme_font ?? "geist",
+        categories,
+        shirt_sizes,
+        theme_layout,
+        theme_font,
         cover_image_url:
           body.cover_image_url === undefined
             ? current.cover_image_url

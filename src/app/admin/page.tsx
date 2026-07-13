@@ -11,7 +11,14 @@ import {
   sortCategoryKeys,
   sortShirtKeys,
 } from "@/lib/registration-stats";
-import { FONTS, LAYOUTS, type FontId, type LayoutId } from "@/lib/themes";
+import {
+  FONTS,
+  LAYOUTS,
+  resolveFont,
+  resolveLayout,
+  type FontId,
+  type LayoutId,
+} from "@/lib/themes";
 import type { EventImage, EventPublic, RegistrationRow } from "@/lib/types";
 
 type Tab =
@@ -90,8 +97,8 @@ export default function AdminPage() {
     setRegistrationOpen(ev.registration_open);
     setCategoriesText((ev.categories || []).join("\n"));
     setSizesText((ev.shirt_sizes || []).join("\n"));
-    setThemeLayout((ev.theme_layout as LayoutId) || "bilheteria");
-    setThemeFont((ev.theme_font as FontId) || "geist");
+    setThemeLayout(resolveLayout(ev.theme_layout));
+    setThemeFont(resolveFont(ev.theme_font));
   }
 
   const loadAll = useCallback(
@@ -174,6 +181,8 @@ export default function AdminPage() {
     }
 
     try {
+      const price = reaisToCents(priceInput);
+      const slots = Number(maxSlots) || 1;
       const res = await fetch("/api/event", {
         method: "PUT",
         headers: {
@@ -181,32 +190,40 @@ export default function AdminPage() {
           "x-admin-password": password,
         },
         body: JSON.stringify({
-          name,
+          name: name.trim() || "Corrida",
           description,
           regulations,
-          event_date: eventDate,
-          start_time: startTime,
+          event_date: eventDate || "2026-09-20",
+          start_time: startTime || "07:00",
           location,
           city,
-          price_cents: reaisToCents(priceInput),
-          max_slots: Number(maxSlots),
+          price_cents: Number.isFinite(price) ? price : 0,
+          max_slots: Number.isFinite(slots) ? slots : 500,
           registration_open: registrationOpen,
           categories,
           shirt_sizes,
-          theme_layout: themeLayout,
-          theme_font: themeFont,
+          theme_layout: resolveLayout(themeLayout),
+          theme_font: resolveFont(themeFont),
         }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Falha ao salvar");
-      fillForm(data.event);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(
+          (data && data.error) || `Falha ao salvar (HTTP ${res.status})`
+        );
+      }
+      if (data.event) fillForm(data.event);
       showSuccess(
-        "Alterações salvas!",
+        "✓ Salvo com sucesso!",
         data.message ||
-          "Os dados da corrida e o visual da home foram atualizados. Abra o site (F5) para conferir."
+          "Alterações gravadas. Abra a home e aperte F5 para ver o novo layout."
       );
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao salvar");
+      const message = err instanceof Error ? err.message : "Erro ao salvar";
+      setError(message);
+      setSuccessModal(null);
+      // Confirmação também no erro, para o botão não “sumir” sem feedback
+      window.alert(`Não foi possível salvar:\n\n${message}`);
     } finally {
       setSaving(false);
     }

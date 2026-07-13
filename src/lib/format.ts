@@ -27,14 +27,14 @@ export function formatDateLongBR(isoDate: string): string {
 }
 
 export function reaisToCents(value: string): number {
-  const cleaned = value.replace(/[^\d,.]/g, "");
+  const cleaned = String(value ?? "").replace(/[^\d,.]/g, "");
   if (!cleaned) return 0;
   // aceita 80, 80,00, 80.00
   const normalized = cleaned.includes(",")
     ? cleaned.replace(/\./g, "").replace(",", ".")
     : cleaned;
   const num = Number(normalized);
-  if (Number.isNaN(num) || num < 0) return 0;
+  if (!Number.isFinite(num) || num < 0) return 0;
   return Math.round(num * 100);
 }
 
