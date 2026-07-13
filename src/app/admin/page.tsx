@@ -2,6 +2,7 @@
 
 import { FormEvent, useCallback, useState } from "react";
 import * as XLSX from "xlsx";
+import { AdminCouponsTab } from "@/components/AdminCouponsTab";
 import { AdminPaymentTab } from "@/components/AdminPaymentTab";
 import { centsToReaisInput, formatBRL, reaisToCents } from "@/lib/format";
 import type { RegistrationStats } from "@/lib/registration-stats";
@@ -11,7 +12,13 @@ import {
 } from "@/lib/registration-stats";
 import type { EventImage, EventPublic, RegistrationRow } from "@/lib/types";
 
-type Tab = "resumo" | "evento" | "fotos" | "recebimento" | "inscritos";
+type Tab =
+  | "resumo"
+  | "evento"
+  | "fotos"
+  | "recebimento"
+  | "cupons"
+  | "inscritos";
 
 const STATUS_LABEL: Record<string, string> = {
   pending: "Pendente",
@@ -346,7 +353,8 @@ export default function AdminPage() {
                   ["evento", "1. Dados da corrida"],
                   ["fotos", "2. Fotos"],
                   ["recebimento", "3. Recebimento"],
-                  ["inscritos", "4. Inscritos"],
+                  ["cupons", "4. Cupons"],
+                  ["inscritos", "5. Inscritos"],
                 ] as const
               ).map(([id, label]) => (
                 <button
@@ -805,6 +813,17 @@ export default function AdminPage() {
             {tab === "recebimento" && (
               <AdminPaymentTab
                 password={password}
+                onMessage={(m, e) => {
+                  setMsg(m);
+                  setError(e);
+                }}
+              />
+            )}
+
+            {tab === "cupons" && (
+              <AdminCouponsTab
+                password={password}
+                priceCents={event?.price_cents ?? 8900}
                 onMessage={(m, e) => {
                   setMsg(m);
                   setError(e);

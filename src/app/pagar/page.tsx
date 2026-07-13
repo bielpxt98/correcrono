@@ -13,8 +13,21 @@ function Content() {
   const method = (params.get("method") === "card" ? "card" : "pix") as
     | "pix"
     | "card";
+  const amountParam = params.get("amount");
+  const couponParam = params.get("coupon");
+  const discountParam = params.get("discount");
+  const originalParam = params.get("original");
 
-  const [price, setPrice] = useState(8900);
+  const [price, setPrice] = useState(
+    amountParam ? Number(amountParam) : 8900
+  );
+  const [original, setOriginal] = useState(
+    originalParam ? Number(originalParam) : 0
+  );
+  const [discount, setDiscount] = useState(
+    discountParam ? Number(discountParam) : 0
+  );
+  const [coupon, setCoupon] = useState(couponParam || "");
   const [eventName, setEventName] = useState("Ingresso");
   const [paying, setPaying] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -30,12 +43,13 @@ function Content() {
       .then((r) => r.json())
       .then((d) => {
         if (d.event) {
-          setPrice(d.event.price_cents);
           setEventName(d.event.name);
+          if (!amountParam) setPrice(d.event.price_cents);
+          if (!originalParam && !amountParam) setOriginal(d.event.price_cents);
         }
       })
       .catch(() => {});
-  }, []);
+  }, [amountParam, originalParam]);
 
   function copyPix() {
     void navigator.clipboard.writeText(demoPixCode);
@@ -66,9 +80,20 @@ function Content() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-xs text-muted uppercase tracking-wide">Total</p>
+            {discount > 0 && original > price && (
+              <p className="text-sm text-muted line-through tabular-nums">
+                {formatBRL(original)}
+              </p>
+            )}
             <p className="text-3xl font-black text-brand-soft tabular-nums">
               {formatBRL(price)}
             </p>
+            {coupon && (
+              <p className="text-xs text-emerald-400 mt-1 font-medium">
+                Cupom {coupon}
+                {discount > 0 ? ` · −${formatBRL(discount)}` : ""}
+              </p>
+            )}
           </div>
           <span
             className={

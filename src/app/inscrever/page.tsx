@@ -19,6 +19,17 @@ export default function InscreverPage() {
   const [payMethod, setPayMethod] = useState<PayMethod>("pix");
   const [acceptPix, setAcceptPix] = useState(true);
   const [acceptCard, setAcceptCard] = useState(true);
+  const [couponInput, setCouponInput] = useState("");
+  const [couponApplied, setCouponApplied] = useState<{
+    code: string;
+    percent: number;
+    original: number;
+    discount: number;
+    final: number;
+    label: string;
+  } | null>(null);
+  const [couponBusy, setCouponBusy] = useState(false);
+  const [couponMsg, setCouponMsg] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/event")
@@ -52,6 +63,7 @@ export default function InscreverPage() {
       shirt_size: String(fd.get("shirt_size") || ""),
       category: String(fd.get("category") || ""),
       payment_method: payMethod,
+      coupon_code: couponApplied?.code || couponInput.trim() || null,
     };
 
     try {
@@ -82,9 +94,25 @@ export default function InscreverPage() {
         return;
       }
 
+      const finalPrice =
+        data.pricing?.final_cents ??
+        couponApplied?.final ??
+        event?.price_cents ??
+        0;
+
       // Demo / sem MP: tela de pagamento simulada
       if (payData.demo || payData.manual || !payRes.ok) {
-        router.push(`/pagar?id=${regId}&method=${payMethod}`);
+        const qs = new URLSearchParams({
+          id: regId,
+          method: payMethod,
+          amount: String(finalPrice),
+        });
+        if (data.pricing?.coupon_code) {
+          qs.set("coupon", String(data.pricing.coupon_code));
+          qs.set("discount", String(data.pricing.discount_cents || 0));
+          qs.set("original", String(data.pricing.original_cents || finalPrice));
+        }
+        router.push(`/pagar?${qs.toString()}`);
         return;
       }
 
@@ -92,6 +120,40 @@ export default function InscreverPage() {
     } catch (err) {
       setFormError(err instanceof Error ? err.message : "Erro ao inscrever");
       setSubmitting(false);
+    }
+  }
+
+  async function applyCoupon() {
+    if (!event) return;
+    setCouponBusy(true);
+    setCouponMsg(null);
+    try {
+      const res = await fetch("/api/cupons/validar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: couponInput,
+          price_cents: event.price_cents,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        setCouponApplied(null);
+        throw new Error(data.error || "Cupom inválido");
+      }
+      setCouponApplied({
+        code: data.code,
+        percent: data.discount_percent,
+        original: data.original_cents,
+        discount: data.discount_cents,
+        final: data.final_cents,
+        label: data.label,
+      });
+      setCouponMsg(`Cupom ${data.code} aplicado: ${data.discount_percent}% off`);
+    } catch (e) {
+      setCouponMsg(e instanceof Error ? e.message : "Erro no cupom");
+    } finally {
+      setCouponBusy(false);
     }
   }
 
@@ -194,6 +256,58 @@ export default function InscreverPage() {
                   </select>
                 </div>
 
+                {/* Cupom de desconto (lojas parceiras) */}
+                <div className="rounded-2xl border border-border bg-card-2/50 p-4 space-y-2">
+                  <p className="text-sm font-medium">Cupom de desconto</p>
+                  <p className="text-xs text-muted">
+                    Tem código da loja parceira? Ex.: MODAPRAIA10
+                  </p>
+                  <div className="flex gap-2">
+                    <input
+                      value={couponInput}
+                      onChange={(e) => {
+                        setCouponInput(e.target.value.toUpperCase());
+                        setCouponApplied(null);
+                        setCouponMsg(null);
+                      }}
+                      placeholder="MODAPRAIA10"
+                      className="flex-1 rounded-xl border border-border bg-card px-3 py-2.5 font-mono text-sm outline-none focus:ring-2 focus:ring-brand/40"
+                    />
+                    <button
+                      type="button"
+                      disabled={couponBusy || !couponInput.trim()}
+                      onClick={() => void applyCoupon()}
+                      className="rounded-xl border border-border px-4 py-2.5 text-sm font-semibold hover:bg-white/5 disabled:opacity-50"
+                    >
+                      {couponBusy ? "…" : "Aplicar"}
+                    </button>
+                  </div>
+                  {couponMsg && (
+                    <p
+                      className={
+                        couponApplied
+                          ? "text-xs text-emerald-400"
+                          : "text-xs text-red-400"
+                      }
+                    >
+                      {couponMsg}
+                    </p>
+                  )}
+                  {couponApplied && (
+                    <div className="text-sm space-y-0.5 pt-1">
+                      <p className="text-muted line-through">
+                        De {formatBRL(couponApplied.original)}
+                      </p>
+                      <p className="text-brand-soft font-bold text-lg">
+                        Por {formatBRL(couponApplied.final)}{" "}
+                        <span className="text-xs font-normal text-muted">
+                          (−{couponApplied.percent}%)
+                        </span>
+                      </p>
+                    </div>
+                  )}
+                </div>
+
                 {/* Forma de pagamento (conforme o organizador liberou no admin) */}
                 <div>
                   <p className="block text-sm font-medium mb-2">
@@ -247,8 +361,8 @@ export default function InscreverPage() {
                   {submitting
                     ? "Processando…"
                     : payMethod === "pix"
-                      ? `Pagar com Pix · ${formatBRL(event.price_cents)}`
-                      : `Pagar com cartão · ${formatBRL(event.price_cents)}`}
+                      ? `Pagar com Pix · ${formatBRL(couponApplied?.final ?? event.price_cents)}`
+                      : `Pagar com cartão · ${formatBRL(couponApplied?.final ?? event.price_cents)}`}
                 </button>
               </form>
             )}

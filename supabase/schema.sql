@@ -85,6 +85,30 @@ create index if not exists registrations_status_idx on public.registrations(stat
 create index if not exists registrations_cpf_idx on public.registrations(cpf);
 create index if not exists registrations_full_name_idx on public.registrations(full_name);
 
+-- Cupom na inscrição
+alter table public.registrations add column if not exists coupon_code text;
+alter table public.registrations add column if not exists discount_cents integer not null default 0;
+
+-- Cupons para lojas parceiras (ex: MODAPRAIA10 = 10%)
+create table if not exists public.coupons (
+  id uuid primary key default gen_random_uuid(),
+  event_id uuid not null references public.events(id) on delete cascade,
+  code text not null,
+  partner_name text not null default '',
+  discount_percent integer not null check (discount_percent >= 1 and discount_percent <= 100),
+  max_uses integer,
+  used_count integer not null default 0,
+  active boolean not null default true,
+  notes text not null default '',
+  created_at timestamptz not null default now(),
+  unique (event_id, code)
+);
+
+create index if not exists coupons_event_id_idx on public.coupons(event_id);
+create index if not exists coupons_code_idx on public.coupons(code);
+
+alter table public.coupons enable row level security;
+
 -- RLS
 alter table public.events enable row level security;
 alter table public.registrations enable row level security;

@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import {
+  consumeCoupon,
+  validateCouponCode,
+} from "@/lib/coupons";
 import { isDemoMode } from "@/lib/demo-data";
 import { getActiveEvent, isValidCpf, onlyDigits } from "@/lib/event";
 import { getServiceSupabase, isSupabaseConfigured } from "@/lib/supabase";
@@ -13,6 +17,7 @@ const bodySchema = z.object({
   shirt_size: z.string().min(1).max(20),
   category: z.string().min(1).max(60),
   payment_method: z.enum(["pix", "card"]).optional(),
+  coupon_code: z.string().max(40).optional().nullable(),
 });
 
 export async function POST(req: NextRequest) {
@@ -34,6 +39,25 @@ export async function POST(req: NextRequest) {
   const data = parsed.data;
   const cpf = onlyDigits(data.cpf);
 
+  async function resolvePrice(baseCents: number) {
+    let amount = baseCents;
+    let discount = 0;
+    let couponCode: string | null = null;
+    let couponId: string | null = null;
+
+    if (data.coupon_code?.trim()) {
+      const v = await validateCouponCode(data.coupon_code, baseCents);
+      if (!v.ok) {
+        return { error: v.error as string };
+      }
+      amount = v.final_cents;
+      discount = v.discount_cents;
+      couponCode = v.coupon.code;
+      couponId = v.coupon.id;
+    }
+    return { amount, discount, couponCode, couponId };
+  }
+
   if (isDemoMode()) {
     if (cpf.length !== 11) {
       return NextResponse.json(
@@ -41,8 +65,21 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    const id = crypto.randomUUID();
     const ev = (await import("@/lib/demo-data")).getDemoEvent();
+    const priced = await resolvePrice(ev.price_cents);
+    if ("error" in priced && priced.error) {
+      return NextResponse.json({ error: priced.error }, { status: 400 });
+    }
+    const { amount, discount, couponCode, couponId } = priced as {
+      amount: number;
+      discount: number;
+      couponCode: string | null;
+      couponId: string | null;
+    };
+
+    if (couponId) await consumeCoupon(couponId);
+
+    const id = crypto.randomUUID();
     return NextResponse.json({
       demo: true,
       registration: {
@@ -58,13 +95,21 @@ export async function POST(req: NextRequest) {
         status: "pending",
         payment_id: null,
         payment_method: data.payment_method || "pix",
-        amount_cents: ev.price_cents,
+        amount_cents: amount,
+        coupon_code: couponCode,
+        discount_cents: discount,
         created_at: new Date().toISOString(),
       },
       event: {
         id: ev.id,
         name: ev.name,
         price_cents: ev.price_cents,
+      },
+      pricing: {
+        original_cents: ev.price_cents,
+        discount_cents: discount,
+        final_cents: amount,
+        coupon_code: couponCode,
       },
     });
   }
@@ -99,6 +144,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Tamanho de camiseta inválido." }, { status: 400 });
     }
 
+    const priced = await resolvePrice(event.price_cents);
+    if ("error" in priced && priced.error) {
+      return NextResponse.json({ error: priced.error }, { status: 400 });
+    }
+    const { amount, discount, couponCode, couponId } = priced as {
+      amount: number;
+      discount: number;
+      couponCode: string | null;
+      couponId: string | null;
+    };
+
     const supabase = getServiceSupabase();
 
     const { data: existing } = await supabase
@@ -125,9 +181,11 @@ export async function POST(req: NextRequest) {
       shirt_size: data.shirt_size,
       category: data.category,
       status: "pending" as const,
-      amount_cents: event.price_cents,
+      amount_cents: amount,
       payment_id: null,
       payment_method: data.payment_method || null,
+      coupon_code: couponCode,
+      discount_cents: discount,
     };
 
     const { data: registration, error } = existing
@@ -149,12 +207,20 @@ export async function POST(req: NextRequest) {
       throw error;
     }
 
+    if (couponId) await consumeCoupon(couponId);
+
     return NextResponse.json({
       registration,
       event: {
         id: event.id,
         name: event.name,
         price_cents: event.price_cents,
+      },
+      pricing: {
+        original_cents: event.price_cents,
+        discount_cents: discount,
+        final_cents: amount,
+        coupon_code: couponCode,
       },
     });
   } catch (err) {
