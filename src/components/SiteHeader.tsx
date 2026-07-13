@@ -20,6 +20,16 @@ export function SiteHeader({ solid = false }: { solid?: boolean }) {
         </Link>
         <nav className="flex items-center gap-2 text-sm">
           <Link
+            href="/admin"
+            className={
+              solid
+                ? "rounded-full border border-border px-3 py-2 font-medium text-muted hover:text-foreground hover:bg-slate-100 transition"
+                : "rounded-full border border-white/25 bg-white/10 px-3 py-2 font-medium text-white/90 hover:bg-white/20 transition"
+            }
+          >
+            Admin
+          </Link>
+          <Link
             href="/inscrever"
             className="rounded-full bg-brand px-4 py-2 font-semibold text-white shadow-lg shadow-orange-900/30 hover:bg-brand-dark transition"
           >
