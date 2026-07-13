@@ -44,6 +44,8 @@ alter table public.events add column if not exists pix_key_type text;
 alter table public.events add column if not exists receiver_name text;
 alter table public.events add column if not exists help_whatsapp text;
 alter table public.events add column if not exists payment_notes text;
+alter table public.events add column if not exists theme_layout text not null default 'bilheteria';
+alter table public.events add column if not exists theme_font text not null default 'geist';
 
 -- Galeria de imagens do evento
 create table if not exists public.event_images (

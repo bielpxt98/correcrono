@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { formatBRL, formatDateLongBR } from "@/lib/format";
+import { resolveFont, resolveLayout } from "@/lib/themes";
 import type { EventPublic } from "@/lib/types";
 
 export default function HomePage() {
@@ -11,6 +12,9 @@ export default function HomePage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [lightbox, setLightbox] = useState<string | null>(null);
+
+  const layout = resolveLayout(event?.theme_layout);
+  const font = resolveFont(event?.theme_font);
 
   useEffect(() => {
     fetch("/api/event")
@@ -27,7 +31,11 @@ export default function HomePage() {
     event?.registration_open && (event?.slots_remaining ?? 0) > 0;
 
   return (
-    <div className="min-h-full flex flex-col bg-background text-foreground">
+    <div
+      className="home-theme min-h-full flex flex-col bg-background text-foreground"
+      data-layout={layout}
+      data-font={font}
+    >
       {loading && (
         <>
           <SiteHeader solid />
@@ -70,32 +78,32 @@ export default function HomePage() {
                   : "linear-gradient(135deg,#1e293b,#0f172a 50%,#7c2d12)",
               }}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-black/40" />
+            <div className="hero-scrim absolute inset-0 bg-gradient-to-t from-background via-background/70 to-black/40" />
             <SiteHeader />
 
             <div className="relative z-10 mx-auto mt-auto w-full max-w-6xl px-4 pb-10 pt-28 grid gap-8 lg:grid-cols-[1.4fr_1fr] items-end">
               <div>
                 <div className="mb-3 flex flex-wrap gap-2">
-                  <span className="rounded-full bg-brand/90 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white">
+                  <span className="rounded-full bg-brand px-3 py-1 text-xs font-bold uppercase tracking-wide text-white">
                     Ingresso oficial
                   </span>
                   {canBuy ? (
-                    <span className="rounded-full bg-emerald-500/20 border border-emerald-400/30 px-3 py-1 text-xs font-medium text-emerald-300">
+                    <span className="rounded-full bg-emerald-500/20 border border-emerald-400/30 px-3 py-1 text-xs font-medium text-emerald-600">
                       Vendas abertas
                     </span>
                   ) : (
-                    <span className="rounded-full bg-red-500/20 border border-red-400/30 px-3 py-1 text-xs font-medium text-red-300">
+                    <span className="rounded-full bg-red-500/20 border border-red-400/30 px-3 py-1 text-xs font-medium text-red-600">
                       Encerrado
                     </span>
                   )}
                 </div>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.05] drop-shadow-lg">
+                <h1 className="hero-title font-display text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.05] drop-shadow-lg text-white">
                   {event.name}
                 </h1>
-                <p className="mt-4 max-w-xl text-base md:text-lg text-slate-200/90 leading-relaxed">
+                <p className="hero-text mt-4 max-w-xl text-base md:text-lg text-slate-200/90 leading-relaxed">
                   {event.description}
                 </p>
-                <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-300">
+                <ul className="hero-text mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-300">
                   <li className="flex items-center gap-2">
                     <span className="text-brand-soft">📅</span>
                     <span className="capitalize">{formatDateLongBR(event.event_date)}</span>

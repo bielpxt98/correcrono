@@ -17,6 +17,8 @@ function normalizeEvent(row: Record<string, unknown>): EventRow {
     cover_image_url: (row.cover_image_url as string | null) ?? null,
     categories: asStringArray(row.categories, ["Geral"]),
     shirt_sizes: asStringArray(row.shirt_sizes, ["P", "M", "G"]),
+    theme_layout: String(row.theme_layout ?? "bilheteria"),
+    theme_font: String(row.theme_font ?? "geist"),
     created_at: String(row.created_at ?? ""),
     updated_at: row.updated_at ? String(row.updated_at) : undefined,
   };

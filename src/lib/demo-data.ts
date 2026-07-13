@@ -19,6 +19,8 @@ export const DEMO_EVENT_INITIAL: EventPublic = {
     "https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&w=1600&q=80",
   categories: ["5K", "10K", "Caminhada 3K"],
   shirt_sizes: ["PP", "P", "M", "G", "GG", "XG"],
+  theme_layout: "bilheteria",
+  theme_font: "geist",
   created_at: new Date().toISOString(),
   slots_remaining: 0, // recalculado abaixo após montar inscritos
   paid_count: 0,

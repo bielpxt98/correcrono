@@ -10,6 +10,7 @@ import {
   sortCategoryKeys,
   sortShirtKeys,
 } from "@/lib/registration-stats";
+import { FONTS, LAYOUTS, type FontId, type LayoutId } from "@/lib/themes";
 import type { EventImage, EventPublic, RegistrationRow } from "@/lib/types";
 
 type Tab =
@@ -60,6 +61,8 @@ export default function AdminPage() {
   const [registrationOpen, setRegistrationOpen] = useState(true);
   const [categoriesText, setCategoriesText] = useState("5K\n10K");
   const [sizesText, setSizesText] = useState("PP\nP\nM\nG\nGG\nXG");
+  const [themeLayout, setThemeLayout] = useState<LayoutId>("bilheteria");
+  const [themeFont, setThemeFont] = useState<FontId>("geist");
 
   function fillForm(ev: EventPublic) {
     setEvent(ev);
@@ -75,6 +78,8 @@ export default function AdminPage() {
     setRegistrationOpen(ev.registration_open);
     setCategoriesText((ev.categories || []).join("\n"));
     setSizesText((ev.shirt_sizes || []).join("\n"));
+    setThemeLayout((ev.theme_layout as LayoutId) || "bilheteria");
+    setThemeFont((ev.theme_font as FontId) || "geist");
   }
 
   const loadAll = useCallback(
@@ -176,12 +181,14 @@ export default function AdminPage() {
           registration_open: registrationOpen,
           categories,
           shirt_sizes,
+          theme_layout: themeLayout,
+          theme_font: themeFont,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Falha ao salvar");
       fillForm(data.event);
-      setMsg("Salvo! O site já está atualizado.");
+      setMsg("Salvo! Layout e fonte da home já atualizados — abra o site para ver.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao salvar");
     } finally {
@@ -593,6 +600,81 @@ export default function AdminPage() {
                   <p className="text-sm text-muted mt-1">
                     Tudo que você mudar aqui aparece no site público.
                   </p>
+                </div>
+
+                {/* Layout + fonte da home */}
+                <div className="rounded-2xl border border-border bg-slate-50 p-4 space-y-4">
+                  <div>
+                    <h3 className="font-bold text-sm">Visual da home</h3>
+                    <p className="text-xs text-muted mt-0.5">
+                      Escolha o layout e a fonte das letras. Depois clique em
+                      salvar e abra o site.
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-medium mb-2">Layout</p>
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                      {LAYOUTS.map((l) => (
+                        <button
+                          key={l.id}
+                          type="button"
+                          onClick={() => setThemeLayout(l.id)}
+                          className={
+                            themeLayout === l.id
+                              ? "rounded-xl border-2 border-brand p-3 text-left bg-white shadow-sm"
+                              : "rounded-xl border border-border p-3 text-left bg-white hover:border-orange-300"
+                          }
+                        >
+                          <div
+                            className="h-10 rounded-lg mb-2"
+                            style={{ background: l.preview }}
+                          />
+                          <p className="font-semibold text-sm">{l.name}</p>
+                          <p className="text-[11px] text-muted mt-0.5 leading-snug">
+                            {l.description}
+                          </p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-medium mb-2">Fonte das letras</p>
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                      {FONTS.map((f) => (
+                        <button
+                          key={f.id}
+                          type="button"
+                          onClick={() => setThemeFont(f.id)}
+                          className={
+                            themeFont === f.id
+                              ? "rounded-xl border-2 border-brand p-3 text-left bg-white"
+                              : "rounded-xl border border-border p-3 text-left bg-white hover:border-orange-300"
+                          }
+                        >
+                          <p
+                            className="font-bold text-base"
+                            style={{ fontFamily: f.cssVar }}
+                          >
+                            Aa {f.name}
+                          </p>
+                          <p className="text-[11px] text-muted mt-1">
+                            {f.description}
+                          </p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <a
+                    href="/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex text-sm font-semibold text-brand hover:underline"
+                  >
+                    Ver site em nova aba →
+                  </a>
                 </div>
 
                 <Field label="Nome da corrida *">

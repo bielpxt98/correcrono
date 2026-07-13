@@ -61,6 +61,12 @@ const updateSchema = z.object({
   categories: z.array(z.string().min(1).max(60)).min(1).max(40),
   shirt_sizes: z.array(z.string().min(1).max(20)).min(1).max(20),
   cover_image_url: z.string().url().nullable().optional(),
+  theme_layout: z
+    .enum(["bilheteria", "light", "neon", "classic", "minimal"])
+    .optional(),
+  theme_font: z
+    .enum(["geist", "montserrat", "oswald", "playfair", "space", "roboto"])
+    .optional(),
 });
 
 export async function PUT(req: NextRequest) {
@@ -102,6 +108,8 @@ export async function PUT(req: NextRequest) {
       registration_open: body.registration_open,
       categories: body.categories.map((c) => c.trim()).filter(Boolean),
       shirt_sizes: body.shirt_sizes.map((s) => s.trim()).filter(Boolean),
+      theme_layout: body.theme_layout ?? current.theme_layout ?? "bilheteria",
+      theme_font: body.theme_font ?? current.theme_font ?? "geist",
       cover_image_url:
         body.cover_image_url === undefined
           ? current.cover_image_url
@@ -146,6 +154,8 @@ export async function PUT(req: NextRequest) {
         registration_open: body.registration_open,
         categories: body.categories.map((c) => c.trim()).filter(Boolean),
         shirt_sizes: body.shirt_sizes.map((s) => s.trim()).filter(Boolean),
+        theme_layout: body.theme_layout ?? current.theme_layout ?? "bilheteria",
+        theme_font: body.theme_font ?? current.theme_font ?? "geist",
         cover_image_url:
           body.cover_image_url === undefined
             ? current.cover_image_url

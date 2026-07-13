@@ -15,6 +15,9 @@ export type EventRow = {
   cover_image_url: string | null;
   categories: string[];
   shirt_sizes: string[];
+  /** Visual da home */
+  theme_layout?: string;
+  theme_font?: string;
   created_at: string;
   updated_at?: string;
 };
