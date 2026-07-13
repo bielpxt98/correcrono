@@ -1,0 +1,19 @@
+# Blueprint opcional — no painel você também pode configurar na mão
+services:
+  - type: web
+    name: inscricoes-corrida
+    runtime: node
+    plan: free
+    region: oregon
+    branch: main
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: DEMO_MODE
+        value: "true"
+      - key: ADMIN_PASSWORD
+        value: demo
+      - key: NEXT_PUBLIC_APP_URL
+        sync: false

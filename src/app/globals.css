@@ -1,26 +1,90 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0b0c10;
+  --foreground: #f8fafc;
+  --brand: #ff4d00;
+  --brand-dark: #e04400;
+  --brand-soft: #ff7a3d;
+  --card: #14161c;
+  --card-2: #1a1d26;
+  --muted: #94a3b8;
+  --border: #2a2f3a;
+  --success: #22c55e;
+  --danger: #ef4444;
+  --warning: #f59e0b;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-brand: var(--brand);
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-soft: var(--brand-soft);
+  --color-card: var(--card);
+  --color-card-2: var(--card-2);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+  --color-warning: var(--warning);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+/* Admin em tema claro para o organizador */
+.admin-theme {
+  --background: #f1f5f9;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-2: #f8fafc;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --brand: #ea580c;
+  --brand-dark: #c2410c;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.admin-theme input,
+.admin-theme select,
+.admin-theme textarea {
+  background: #fff;
+  color: #0f172a;
+}
+
+.admin-theme .field {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  padding: 0.65rem 0.75rem;
+  outline: none;
+  background: #fff;
+  color: #0f172a;
+}
+
+.admin-theme .field:focus {
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.2);
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 999px;
 }
