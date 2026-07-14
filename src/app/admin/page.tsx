@@ -72,6 +72,8 @@ export default function AdminPage() {
     message: string;
   } | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [fontMenuOpen, setFontMenuOpen] = useState(false);
+  const [colorMenuOpen, setColorMenuOpen] = useState(false);
 
   function showSuccess(title: string, message: string) {
     setMsg(message);
@@ -386,7 +388,6 @@ export default function AdminPage() {
     { id: "resumo", label: "Resumo", icon: "⌂" },
     { id: "evento", label: "Dados", icon: "☰" },
     { id: "visual", label: "Layout", icon: "▦" },
-    { id: "cores", label: "Cores", icon: "◉" },
     { id: "contatos", label: "Contatos", icon: "✉" },
     { id: "fotos", label: "Fotos", icon: "▣" },
     { id: "recebimento", label: "Recebimento", icon: "₴" },
@@ -398,8 +399,8 @@ export default function AdminPage() {
   const tabTitle: Record<Tab, string> = {
     resumo: "Resumo",
     evento: "Dados da corrida",
-    visual: "Layout da home",
-    cores: "Cores",
+    visual: "Layout · fonte · cores",
+    cores: "Layout · fonte · cores",
     contatos: "Contatos",
     fotos: "Fotos",
     recebimento: "Recebimento",
@@ -407,6 +408,10 @@ export default function AdminPage() {
     senha: "Senha",
     inscritos: "Inscritos",
   };
+
+  const activeTab: Tab = tab === "cores" ? "visual" : tab;
+  const selectedFont = FONTS.find((f) => f.id === themeFont) || FONTS[0];
+  const selectedColor = COLORS.find((c) => c.id === themeColor) || COLORS[0];
 
   return (
     <div className="admin-theme min-h-full">
@@ -475,15 +480,13 @@ export default function AdminPage() {
               </div>
             </div>
             <p className="text-sm text-muted">
-              Senha padrão inicial: <strong className="text-white">admin123</strong>
-              <br />
-              Depois você pode trocar em <strong className="text-white">Senha</strong>.
+              Digite a senha do organizador para acessar o painel.
             </p>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="admin123"
+              placeholder="Senha"
               className="field"
               autoFocus
             />
@@ -524,11 +527,13 @@ export default function AdminPage() {
                 <button
                   key={item.id}
                   type="button"
-                  className={`admin-nav-btn ${tab === item.id ? "active" : ""}`}
+                  className={`admin-nav-btn ${activeTab === item.id ? "active" : ""}`}
                   onClick={() => {
                     setTab(item.id);
                     setMsg(null);
                     setError(null);
+                    setFontMenuOpen(false);
+                    setColorMenuOpen(false);
                     setSidebarOpen(false);
                   }}
                 >
@@ -561,10 +566,10 @@ export default function AdminPage() {
                 </button>
                 <div className="min-w-0">
                   <h1 className="text-xl md:text-2xl font-bold text-white truncate">
-                    {event?.name || tabTitle[tab]}
+                    {event?.name || tabTitle[activeTab]}
                   </h1>
                   <p className="text-xs text-muted truncate">
-                    {tabTitle[tab]} · painel do organizador
+                    {tabTitle[activeTab]} · painel do organizador
                   </p>
                 </div>
               </div>
@@ -602,7 +607,7 @@ export default function AdminPage() {
                 </div>
               )}
 
-              {event && tab !== "resumo" && (
+              {event && activeTab !== "resumo" && (
                 <div className="mb-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <MiniStat label="Vagas restantes" value={String(event.slots_remaining)} />
                   <MiniStat label="Máximo" value={String(event.max_slots)} />
@@ -611,7 +616,7 @@ export default function AdminPage() {
                 </div>
               )}
 
-              {tab === "resumo" && stats && event && (
+              {activeTab === "resumo" && stats && event && (
                 <div className="space-y-5">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="admin-glass rounded-2xl p-5 md:p-6">
@@ -789,32 +794,28 @@ export default function AdminPage() {
                 </div>
               )}
 
-              {tab === "visual" && (
+              {activeTab === "visual" && (
                 <form
-                  onSubmit={(e) => void saveEvent(e)}
+                  onSubmit={(e) => {
+                    setFontMenuOpen(false);
+                    setColorMenuOpen(false);
+                    void saveEvent(e);
+                  }}
                   className="admin-glass rounded-2xl p-5 md:p-8 space-y-6"
                 >
                   <div>
                     <h2 className="text-2xl font-black tracking-tight text-white">
-                      Designs da home (para atletas)
+                      Layout da home
                     </h2>
                     <p className="text-sm text-muted mt-1">
-                      Escolha como os atletas veem a página. Cada opção muda a estrutura
-                      (fotos, título, botões) — como nas referências de layout.
+                      Escolha o design (como os atletas veem), a fonte e as cores — tudo
+                      nesta aba. Salve e atualize a home (F5).
                     </p>
-                  </div>
-
-                  <div className="rounded-xl bg-amber-500/10 border border-amber-500/25 px-4 py-3 text-sm text-amber-100">
-                    1) Clique em um design → 2) <strong>Salvar</strong> → 3) abra a{" "}
-                    <a href="/" className="font-bold underline" target="_blank" rel="noreferrer">
-                      home
-                    </a>{" "}
-                    e dê F5.
                   </div>
 
                   <div>
                     <p className="text-base font-bold mb-3 text-white">
-                      1. Layout da página pública
+                      1. Design da página
                     </p>
                     <div className="grid sm:grid-cols-2 gap-4">
                       {LAYOUTS.map((l) => (
@@ -831,12 +832,9 @@ export default function AdminPage() {
                           <LayoutWirePreview id={l.id} accent={l.accent} bg={l.previewBg} />
                           <p className="font-bold text-base mt-3 text-white">{l.name}</p>
                           <p className="text-xs text-muted mt-1 leading-snug">{l.description}</p>
-                          <p className="text-[11px] text-muted mt-2 font-mono bg-black/30 rounded-lg px-2 py-1">
-                            {l.structure}
-                          </p>
                           {themeLayout === l.id && (
                             <p className="text-[11px] font-bold text-brand mt-2">
-                              ✓ Design selecionado
+                              ✓ Selecionado
                             </p>
                           )}
                         </button>
@@ -844,29 +842,177 @@ export default function AdminPage() {
                     </div>
                   </div>
 
-                  <div>
-                    <p className="text-base font-bold mb-3 text-white">2. Fonte das letras</p>
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {FONTS.map((f) => (
+                  {/* Fonte + cor estilo lista (tipo Excel) */}
+                  <div className="grid sm:grid-cols-2 gap-5">
+                    <div>
+                      <p className="text-sm font-bold mb-2 text-white">2. Fonte das letras</p>
+                      <div className="relative">
                         <button
-                          key={f.id}
                           type="button"
-                          onClick={() => setThemeFont(f.id)}
-                          className={
-                            themeFont === f.id
-                              ? "rounded-2xl border-2 border-brand p-4 text-left bg-brand/10 ring-2 ring-brand/20"
-                              : "rounded-2xl border border-white/10 p-4 text-left bg-white/5 hover:border-brand/40"
-                          }
+                          onClick={() => {
+                            setFontMenuOpen((o) => !o);
+                            setColorMenuOpen(false);
+                          }}
+                          className="w-full flex items-center justify-between gap-3 rounded-xl border border-white/15 bg-[#1a1f2a] px-3 py-2.5 text-left hover:border-brand/50 transition"
+                          aria-expanded={fontMenuOpen}
+                          aria-haspopup="listbox"
                         >
-                          <p className="text-2xl font-bold text-white" style={{ fontFamily: f.family }}>
-                            Aa Bb Cc
-                          </p>
-                          <p className="font-semibold mt-2 text-white">{f.name}</p>
-                          <p className="text-xs text-muted mt-0.5">{f.description}</p>
+                          <span
+                            className="text-base text-white truncate"
+                            style={{ fontFamily: selectedFont.family }}
+                          >
+                            {selectedFont.name}
+                          </span>
+                          <span className="text-muted text-xs shrink-0">
+                            {fontMenuOpen ? "▲" : "▼"}
+                          </span>
                         </button>
-                      ))}
+                        {fontMenuOpen && (
+                          <ul
+                            role="listbox"
+                            className="absolute z-40 mt-1 w-full max-h-64 overflow-y-auto rounded-xl border border-white/15 bg-[#151922] shadow-2xl shadow-black/50 py-1"
+                          >
+                            {FONTS.map((f) => (
+                              <li key={f.id}>
+                                <button
+                                  type="button"
+                                  role="option"
+                                  aria-selected={themeFont === f.id}
+                                  onClick={() => {
+                                    setThemeFont(f.id);
+                                    setFontMenuOpen(false);
+                                  }}
+                                  className={
+                                    themeFont === f.id
+                                      ? "w-full flex items-center justify-between gap-2 px-3 py-2.5 text-left bg-brand/20 text-white"
+                                      : "w-full flex items-center justify-between gap-2 px-3 py-2.5 text-left text-white/90 hover:bg-white/10"
+                                  }
+                                >
+                                  <span
+                                    className="text-[15px] truncate"
+                                    style={{ fontFamily: f.family }}
+                                  >
+                                    {f.name}
+                                  </span>
+                                  <span className="text-[11px] text-muted shrink-0">
+                                    {f.description}
+                                  </span>
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                      <p
+                        className="mt-2 text-sm text-muted"
+                        style={{ fontFamily: selectedFont.family }}
+                      >
+                        Prévia: Aa Bb Cc 123
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-sm font-bold mb-2 text-white">3. Cores da home</p>
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setColorMenuOpen((o) => !o);
+                            setFontMenuOpen(false);
+                          }}
+                          className="w-full flex items-center justify-between gap-3 rounded-xl border border-white/15 bg-[#1a1f2a] px-3 py-2.5 text-left hover:border-brand/50 transition"
+                          aria-expanded={colorMenuOpen}
+                          aria-haspopup="listbox"
+                        >
+                          <span className="flex items-center gap-2 min-w-0">
+                            <span className="flex gap-1 shrink-0">
+                              <span
+                                className="h-5 w-5 rounded border border-white/20"
+                                style={{ background: selectedColor.vars.brand }}
+                              />
+                              <span
+                                className="h-5 w-5 rounded border border-white/20"
+                                style={{ background: selectedColor.vars.background }}
+                              />
+                              <span
+                                className="h-5 w-5 rounded border border-white/20"
+                                style={{ background: selectedColor.vars.brandSoft }}
+                              />
+                            </span>
+                            <span className="text-sm text-white truncate">
+                              {selectedColor.name}
+                            </span>
+                          </span>
+                          <span className="text-muted text-xs shrink-0">
+                            {colorMenuOpen ? "▲" : "▼"}
+                          </span>
+                        </button>
+                        {colorMenuOpen && (
+                          <ul
+                            role="listbox"
+                            className="absolute z-40 mt-1 w-full max-h-72 overflow-y-auto rounded-xl border border-white/15 bg-[#151922] shadow-2xl shadow-black/50 py-1"
+                          >
+                            {COLORS.map((c) => (
+                              <li key={c.id}>
+                                <button
+                                  type="button"
+                                  role="option"
+                                  aria-selected={themeColor === c.id}
+                                  onClick={() => {
+                                    setThemeColor(c.id);
+                                    setColorMenuOpen(false);
+                                  }}
+                                  className={
+                                    themeColor === c.id
+                                      ? "w-full flex items-center gap-3 px-3 py-2.5 text-left bg-brand/20"
+                                      : "w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-white/10"
+                                  }
+                                >
+                                  <span className="flex gap-1 shrink-0">
+                                    <span
+                                      className="h-5 w-5 rounded border border-white/15"
+                                      style={{ background: c.vars.background }}
+                                    />
+                                    <span
+                                      className="h-5 w-5 rounded border border-white/15"
+                                      style={{ background: c.vars.brand }}
+                                    />
+                                    <span
+                                      className="h-5 w-5 rounded border border-white/15"
+                                      style={{ background: c.vars.brandSoft }}
+                                    />
+                                  </span>
+                                  <span className="min-w-0">
+                                    <span className="block text-sm font-medium text-white truncate">
+                                      {c.name}
+                                    </span>
+                                    <span className="block text-[11px] text-muted truncate">
+                                      {c.description}
+                                    </span>
+                                  </span>
+                                  {themeColor === c.id && (
+                                    <span className="ml-auto text-brand text-xs font-bold">✓</span>
+                                  )}
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
                     </div>
                   </div>
+
+                  {(fontMenuOpen || colorMenuOpen) && (
+                    <button
+                      type="button"
+                      className="fixed inset-0 z-30 cursor-default bg-transparent"
+                      aria-label="Fechar menu"
+                      onClick={() => {
+                        setFontMenuOpen(false);
+                        setColorMenuOpen(false);
+                      }}
+                    />
+                  )}
 
                   <div className="flex flex-col sm:flex-row gap-3 pt-2">
                     <button
@@ -874,7 +1020,7 @@ export default function AdminPage() {
                       disabled={saving}
                       className="rounded-xl bg-brand px-8 py-3.5 font-bold text-white hover:bg-brand-dark disabled:opacity-60 text-base"
                     >
-                      {saving ? "Salvando…" : "Salvar layout e aplicar na home"}
+                      {saving ? "Salvando…" : "Salvar e aplicar na home"}
                     </button>
                     <a
                       href="/"
@@ -888,7 +1034,7 @@ export default function AdminPage() {
                 </form>
               )}
 
-              {tab === "contatos" && (
+              {activeTab === "contatos" && (
                 <AdminContactsTab
                   event={event}
                   password={password}
@@ -900,76 +1046,7 @@ export default function AdminPage() {
                 />
               )}
 
-              {tab === "cores" && (
-                <form
-                  onSubmit={(e) => void saveEvent(e)}
-                  className="admin-glass rounded-2xl p-5 md:p-8 space-y-6"
-                >
-                  <div>
-                    <h2 className="text-2xl font-black tracking-tight text-white">Cores da home</h2>
-                    <p className="text-sm text-muted mt-1">
-                      Paleta de botões, destaques e fundos. Combina com o layout escolhido.
-                    </p>
-                  </div>
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    {COLORS.map((c) => (
-                      <button
-                        key={c.id}
-                        type="button"
-                        onClick={() => setThemeColor(c.id)}
-                        className={
-                          themeColor === c.id
-                            ? "rounded-2xl border-2 border-brand p-4 text-left bg-brand/10 ring-2 ring-brand/20"
-                            : "rounded-2xl border border-white/10 p-4 text-left bg-white/5 hover:border-brand/40"
-                        }
-                      >
-                        <div className="flex gap-1.5 mb-3">
-                          <span
-                            className="h-10 flex-1 rounded-lg border border-white/10"
-                            style={{ background: c.vars.background }}
-                          />
-                          <span
-                            className="h-10 w-12 rounded-lg border border-white/10"
-                            style={{ background: c.vars.brand }}
-                          />
-                          <span
-                            className="h-10 w-10 rounded-lg border border-white/10"
-                            style={{ background: c.vars.brandSoft }}
-                          />
-                          <span
-                            className="h-10 w-10 rounded-lg border border-white/10"
-                            style={{ background: c.vars.card }}
-                          />
-                        </div>
-                        <p className="font-bold text-white">{c.name}</p>
-                        <p className="text-xs text-muted mt-0.5">{c.description}</p>
-                        {themeColor === c.id && (
-                          <p className="text-[11px] font-bold text-brand mt-2">✓ Selecionada</p>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <button
-                      type="submit"
-                      disabled={saving}
-                      className="rounded-xl bg-brand px-8 py-3.5 font-bold text-white hover:bg-brand-dark disabled:opacity-60"
-                    >
-                      {saving ? "Salvando…" : "Salvar cores e aplicar na home"}
-                    </button>
-                    <a
-                      href="/"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center justify-center rounded-xl border border-white/15 px-6 py-3.5 text-sm font-semibold"
-                    >
-                      Abrir home →
-                    </a>
-                  </div>
-                </form>
-              )}
-
-              {tab === "evento" && (
+              {activeTab === "evento" && (
                 <form
                   onSubmit={(e) => void saveEvent(e)}
                   className="admin-glass rounded-2xl p-5 md:p-8 space-y-5"
@@ -1130,7 +1207,7 @@ export default function AdminPage() {
                 </form>
               )}
 
-              {tab === "fotos" && (
+              {activeTab === "fotos" && (
                 <div className="admin-glass rounded-2xl p-5 md:p-8 space-y-6">
                   <div>
                     <h2 className="text-lg font-bold text-white">Fotos do evento</h2>
@@ -1202,7 +1279,7 @@ export default function AdminPage() {
                 </div>
               )}
 
-              {tab === "recebimento" && (
+              {activeTab === "recebimento" && (
                 <AdminPaymentTab
                   password={password}
                   onMessage={(m, e) => {
@@ -1213,7 +1290,7 @@ export default function AdminPage() {
                 />
               )}
 
-              {tab === "cupons" && (
+              {activeTab === "cupons" && (
                 <AdminCouponsTab
                   password={password}
                   priceCents={event?.price_cents ?? 8900}
@@ -1225,7 +1302,7 @@ export default function AdminPage() {
                 />
               )}
 
-              {tab === "senha" && (
+              {activeTab === "senha" && (
                 <AdminPasswordTab
                   password={password}
                   onPasswordChanged={(np) => setPassword(np)}
@@ -1237,7 +1314,7 @@ export default function AdminPage() {
                 />
               )}
 
-              {tab === "inscritos" && (
+              {activeTab === "inscritos" && (
                 <div className="space-y-4">
                   <div>
                     <h2 className="text-lg font-bold text-white">Inscritos</h2>

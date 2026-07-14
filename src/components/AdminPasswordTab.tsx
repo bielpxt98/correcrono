@@ -65,8 +65,7 @@ export function AdminPasswordTab({
       <div>
         <h2 className="text-2xl font-black tracking-tight">Senha do painel</h2>
         <p className="text-sm text-muted mt-1">
-          Altere a senha de acesso do organizador. A senha padrão inicial é{" "}
-          <strong>admin123</strong>.
+          Altere a senha de acesso do organizador.
         </p>
       </div>
 
