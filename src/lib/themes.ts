@@ -62,19 +62,30 @@ export type ColorOption = {
 export const LAYOUTS: LayoutOption[] = [
   {
     id: "bilheteria",
-    name: "Bilheteria",
-    description: "Foto de fundo, título à esquerda e card de ingresso à direita.",
-    structure: "Hero foto + letreiro + card | galeria",
+    name: "Chegada (CTA)",
+    description:
+      "Hero com foto de chegada, botão Inscreva-se, dados do evento e cards de categorias — como o layout de atleta na foto.",
+    structure: "Hero foto + CTA | data/local | cards categorias",
     previewBg: "#0b0c10",
-    accent: "#ff4d00",
+    accent: "#ff6a1a",
   },
   {
     id: "poster",
-    name: "Cartaz central",
-    description: "Título e botão no centro sobre a foto. Galeria em grade.",
-    structure: "Foto full | título centro | grade",
-    previewBg: "#111827",
-    accent: "#38bdf8",
+    name: "Noturno cinematográfico",
+    description:
+      "Foto full-bleed noturna, título grande embaixo, pílulas de categoria e botão Saiba Mais.",
+    structure: "Foto full | título inferior | pílulas + Saiba Mais",
+    previewBg: "#050508",
+    accent: "#ffffff",
+  },
+  {
+    id: "revista",
+    name: "Elegante central",
+    description:
+      "Card flutuante com navegação, título serifado sobre a foto, faixas de info e galeria de momentos.",
+    structure: "Nav | foto + título | info | galeria",
+    previewBg: "#12141a",
+    accent: "#e8e0d4",
   },
   {
     id: "vitrine",
@@ -83,14 +94,6 @@ export const LAYOUTS: LayoutOption[] = [
     structure: "Faixa fotos | título + card",
     previewBg: "#f8fafc",
     accent: "#0ea5e9",
-  },
-  {
-    id: "revista",
-    name: "Revista",
-    description: "Título no topo, ingresso no meio, mosaico de fotos.",
-    structure: "Letreiro | ingresso | mosaico",
-    previewBg: "#0f172a",
-    accent: "#d4a017",
   },
   {
     id: "catalogo",

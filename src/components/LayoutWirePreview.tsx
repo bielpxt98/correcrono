@@ -17,20 +17,17 @@ export function LayoutWirePreview({
       className="h-28 w-full rounded-xl overflow-hidden border border-black/10 p-2 flex flex-col gap-1"
       style={{ background: bg }}
     >
+      {/* Chegada CTA */}
       {id === "bilheteria" && (
         <>
-          <div className="flex-1 flex gap-1.5 items-end p-1">
-            <div className="flex-1 space-y-1">
-              <div className="h-2 w-3/4 rounded" style={{ background: accent }} />
-              <div className="h-1.5 w-full rounded opacity-50" style={{ background: block }} />
-              <div className="h-1.5 w-2/3 rounded opacity-40" style={{ background: block }} />
-            </div>
-            <div
-              className="w-10 h-14 rounded-md shrink-0"
-              style={{ background: accent, opacity: 0.9 }}
-            />
+          <div className="flex-1 flex flex-col items-center justify-center gap-1 rounded-lg relative overflow-hidden"
+            style={{ background: soft }}
+          >
+            <div className="h-2 w-1/2 rounded" style={{ background: accent }} />
+            <div className="h-1.5 w-1/3 rounded opacity-50" style={{ background: block }} />
+            <div className="h-3 w-14 rounded mt-1" style={{ background: accent }} />
           </div>
-          <div className="flex gap-1 h-5">
+          <div className="flex gap-1 h-6">
             <div className="flex-1 rounded" style={{ background: soft }} />
             <div className="flex-1 rounded" style={{ background: soft }} />
             <div className="flex-1 rounded" style={{ background: soft }} />
@@ -38,17 +35,19 @@ export function LayoutWirePreview({
         </>
       )}
 
+      {/* Noturno cinematográfico */}
       {id === "poster" && (
         <>
-          <div className="flex-1 flex flex-col items-center justify-center gap-1">
-            <div className="h-2.5 w-2/3 rounded" style={{ background: accent }} />
-            <div className="h-1.5 w-1/2 rounded opacity-50" style={{ background: block }} />
-            <div className="h-4 w-12 rounded-full mt-1" style={{ background: accent }} />
-          </div>
-          <div className="grid grid-cols-3 gap-0.5 h-8">
-            <div className="rounded-sm" style={{ background: soft }} />
-            <div className="rounded-sm" style={{ background: soft }} />
-            <div className="rounded-sm" style={{ background: soft }} />
+          <div className="flex-1 flex flex-col justify-end gap-1 p-1 rounded-lg" style={{ background: soft }}>
+            <div className="h-2.5 w-3/4 rounded" style={{ background: accent }} />
+            <div className="h-1 w-1/2 rounded opacity-40" style={{ background: block }} />
+            <div className="flex gap-1 mt-1">
+              <div className="h-3 w-8 rounded" style={{ background: block, opacity: 0.6 }} />
+              <div className="h-3 w-8 rounded" style={{ background: block, opacity: 0.6 }} />
+              <div className="h-3 w-8 rounded" style={{ background: block, opacity: 0.6 }} />
+              <div className="flex-1" />
+              <div className="h-3 w-10 rounded border border-white/20" style={{ background: "transparent" }} />
+            </div>
           </div>
         </>
       )}
@@ -71,16 +70,20 @@ export function LayoutWirePreview({
         </>
       )}
 
+      {/* Elegante central */}
       {id === "revista" && (
         <>
-          <div className="h-6 flex flex-col items-center justify-center gap-0.5">
-            <div className="h-2 w-2/3 rounded" style={{ background: accent }} />
-            <div className="h-1 w-1/3 rounded opacity-40" style={{ background: block }} />
-          </div>
-          <div className="mx-auto w-10 h-8 rounded-md" style={{ background: accent }} />
-          <div className="grid grid-cols-4 gap-0.5 flex-1 mt-1">
+          <div className="h-3 flex justify-center gap-1.5 items-center">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="rounded-sm" style={{ background: soft }} />
+              <div key={i} className="h-1 w-4 rounded opacity-40" style={{ background: block }} />
+            ))}
+          </div>
+          <div className="flex-1 rounded-md flex items-center justify-center" style={{ background: soft }}>
+            <div className="h-2 w-1/2 rounded" style={{ background: accent }} />
+          </div>
+          <div className="flex gap-0.5 h-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex-1 rounded-sm" style={{ background: soft }} />
             ))}
           </div>
         </>

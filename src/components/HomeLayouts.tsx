@@ -182,40 +182,138 @@ function GalleryGrid({
   );
 }
 
-/** Layout 1 — Bilheteria (atual) */
+/**
+ * Layout “Chegada (CTA)” — foto de referência q2XnJ
+ * Hero com foto, título + subtítulo, botão laranja, faixa de dados e cards de categorias.
+ */
 function LayoutBilheteria(p: Props) {
   const { event, canBuy, onOpenPhoto } = p;
+  const cover =
+    event.cover_image_url ||
+    event.images[0]?.url ||
+    null;
+
   return (
     <>
-      <section className="relative min-h-[72vh] flex flex-col">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: event.cover_image_url
-              ? `url(${event.cover_image_url})`
-              : "linear-gradient(135deg,#1e293b,#0f172a 50%,#7c2d12)",
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-black/40" />
-        <div className="relative z-10 mx-auto mt-auto w-full max-w-6xl px-4 pb-10 pt-28 grid gap-8 lg:grid-cols-[1.4fr_1fr] items-end">
-          <div>
-            <Badges canBuy={canBuy} />
-            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.05] text-white drop-shadow-lg">
-              {event.name}
-            </h1>
-            <p className="mt-4 max-w-xl text-base md:text-lg text-slate-200/90 leading-relaxed">
-              {event.description}
-            </p>
-            <div className="mt-6 text-slate-300">
-              <MetaLine event={event} />
+      <section className="relative mx-auto w-full max-w-5xl px-3 pt-6 md:pt-10">
+        <div className="relative overflow-hidden rounded-[1.75rem] md:rounded-[2rem] shadow-2xl shadow-black/50 border border-white/10">
+          <div className="relative min-h-[52vh] md:min-h-[58vh] flex flex-col items-center justify-center text-center px-6 py-16">
+            <div
+              className="absolute inset-0 bg-cover bg-center"
+              style={{
+                backgroundImage: cover
+                  ? `url(${cover})`
+                  : "linear-gradient(160deg,#1a0a00 0%,#3d1a0a 40%,#0b0c10 100%)",
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/25" />
+            <div className="relative z-10 max-w-2xl">
+              <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-white drop-shadow-lg">
+                {event.name}
+              </h1>
+              <p className="mt-4 text-base md:text-lg text-white/85 leading-relaxed max-w-lg mx-auto">
+                {event.description?.split("\n")[0] ||
+                  "Inscreva-se para a corrida mais esperada do ano"}
+              </p>
+              {canBuy ? (
+                <Link
+                  href="/inscrever"
+                  className="mt-8 inline-flex items-center justify-center rounded-xl bg-brand px-8 py-3.5 text-base font-bold text-white shadow-lg shadow-orange-900/40 hover:bg-brand-dark transition"
+                >
+                  Inscreva-se Agora
+                </Link>
+              ) : (
+                <span className="mt-8 inline-flex rounded-xl bg-white/10 border border-white/20 px-8 py-3.5 text-base font-semibold text-white/80">
+                  Inscrições encerradas
+                </span>
+              )}
             </div>
           </div>
-          <TicketCard event={event} canBuy={canBuy} />
+
+          {/* Painel inferior escuro com dados + categorias */}
+          <div className="bg-[#12141a] px-5 md:px-10 py-8 md:py-10">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center sm:text-left border-b border-white/10 pb-8">
+              <div>
+                <p className="text-xs text-muted uppercase tracking-wide">
+                  Data do Evento
+                </p>
+                <p className="mt-1 font-semibold text-white capitalize">
+                  {formatDateLongBR(event.event_date)}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-muted uppercase tracking-wide">
+                  Distância
+                </p>
+                <p className="mt-1 font-semibold text-white">
+                  {event.categories.length
+                    ? event.categories.join(", ")
+                    : "—"}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-muted uppercase tracking-wide">Local</p>
+                <p className="mt-1 font-semibold text-white">
+                  {event.location}
+                  {event.city ? `, ${event.city}` : ""}
+                </p>
+              </div>
+            </div>
+
+            {event.categories.length > 0 && (
+              <div className="mt-8">
+                <h2 className="text-lg font-bold text-white mb-4">Categorias</h2>
+                <div className="grid sm:grid-cols-3 gap-3">
+                  {event.categories.map((cat, i) => {
+                    const icons = ["🏃", "⚡", "🚶"];
+                    return (
+                      <div
+                        key={cat}
+                        className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-4 text-left hover:border-brand/40 transition"
+                      >
+                        <p className="text-brand-soft text-lg">
+                          {icons[i % icons.length]}
+                        </p>
+                        <p className="mt-1 font-bold text-white">{cat}</p>
+                        <p className="mt-1 text-xs text-muted leading-snug">
+                          {i === 0
+                            ? "Desafio principal da prova"
+                            : i === 1
+                              ? "Ritmo forte e competitivo"
+                              : "Para todos os níveis"}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <p className="text-sm text-muted">
+                Ingresso a partir de{" "}
+                <strong className="text-white">
+                  {formatBRL(event.price_cents)}
+                </strong>
+                {" · "}
+                {event.slots_remaining} vagas
+              </p>
+              {canBuy && (
+                <Link
+                  href="/inscrever"
+                  className="inline-flex justify-center rounded-xl bg-brand px-6 py-3 text-sm font-bold text-white hover:bg-brand-dark"
+                >
+                  Comprar ingresso
+                </Link>
+              )}
+            </div>
+          </div>
         </div>
       </section>
-      {event.images.length > 0 && (
-        <section className="mx-auto w-full max-w-6xl px-4 py-12">
-          <h2 className="text-2xl font-bold mb-5">Galeria</h2>
+
+      {event.images.length > 1 && (
+        <section className="mx-auto w-full max-w-5xl px-4 py-12">
+          <h2 className="text-xl font-bold mb-5">Galeria</h2>
           <GalleryStrip event={event} onOpenPhoto={onOpenPhoto} />
         </section>
       )}
@@ -223,52 +321,247 @@ function LayoutBilheteria(p: Props) {
   );
 }
 
-/** Layout 2 — Cartaz central */
+/**
+ * Layout “Noturno cinematográfico” — foto de referência H094F
+ * Full-bleed noturno, título grande inferior, pílulas e Saiba Mais.
+ */
 function LayoutPoster(p: Props) {
   const { event, canBuy, onOpenPhoto } = p;
+  const cover =
+    event.cover_image_url ||
+    event.images[0]?.url ||
+    null;
+
   return (
     <>
-      <section className="relative min-h-[80vh] flex flex-col items-center justify-center text-center px-4">
+      <section className="relative min-h-[100svh] flex flex-col">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: event.cover_image_url
-              ? `url(${event.cover_image_url})`
-              : "linear-gradient(135deg,#0f172a,#1e3a5f)",
+            backgroundImage: cover
+              ? `url(${cover})`
+              : "linear-gradient(180deg,#0a0a12 0%,#1a1a2e 50%,#050508 100%)",
           }}
         />
-        <div className="absolute inset-0 bg-black/55" />
-        <div className="relative z-10 max-w-3xl pt-24 pb-16">
-          <Badges canBuy={canBuy} center />
-          <h1 className="font-display text-5xl md:text-7xl font-black text-white tracking-tight drop-shadow-xl">
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-transparent to-transparent" />
+
+        <div className="relative z-10 mt-auto w-full max-w-6xl mx-auto px-5 md:px-10 pb-14 md:pb-20 pt-32">
+          <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight text-white leading-[0.95] max-w-4xl">
             {event.name}
           </h1>
-          <p className="mt-6 text-lg text-white/85 leading-relaxed">
-            {event.description}
+          <p className="mt-5 text-sm sm:text-base md:text-lg uppercase tracking-[0.18em] text-white/80 font-medium max-w-2xl">
+            {event.description?.split("\n")[0] || event.location}
           </p>
-          <div className="mt-6 flex justify-center text-white/80">
-            <MetaLine event={event} />
-          </div>
-          <p className="mt-8 text-4xl font-black text-brand-soft">
-            {formatBRL(event.price_cents)}
+          <p className="mt-3 text-sm md:text-base text-white/70 max-w-xl">
+            <span className="capitalize">
+              {formatDateLongBR(event.event_date)}
+            </span>
+            {event.city ? ` · ${event.city}` : ""}
+            {event.location ? ` · ${event.location}` : ""}
           </p>
-          {canBuy && (
-            <Link
-              href="/inscrever"
-              className="mt-6 inline-flex rounded-full bg-brand px-10 py-4 text-lg font-bold text-white shadow-xl hover:bg-brand-dark"
-            >
-              Comprar ingresso
-            </Link>
+          {event.start_time && (
+            <p className="mt-1 text-sm text-white/55">
+              Largada às {event.start_time}
+              {event.registration_open
+                ? " · Inscrições abertas"
+                : " · Inscrições encerradas"}
+            </p>
           )}
+
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            {event.categories.map((c) => (
+              <span
+                key={c}
+                className="rounded-lg border border-white/25 bg-white/5 backdrop-blur-sm px-4 py-2 text-sm font-medium text-white"
+              >
+                {c}
+              </span>
+            ))}
+            <div className="flex-1 min-w-[1rem]" />
+            {canBuy ? (
+              <Link
+                href="/inscrever"
+                className="rounded-lg border border-white/35 bg-transparent px-5 py-2.5 text-sm font-semibold text-white hover:bg-white/10 transition"
+              >
+                Saiba Mais
+              </Link>
+            ) : (
+              <span className="rounded-lg border border-white/20 px-5 py-2.5 text-sm text-white/50">
+                Encerrado
+              </span>
+            )}
+          </div>
+
+          <div className="mt-10 max-w-sm">
+            <TicketCard event={event} canBuy={canBuy} compact />
+          </div>
         </div>
       </section>
+
       {event.images.length > 0 && (
         <section className="mx-auto w-full max-w-6xl px-4 py-14">
-          <h2 className="text-2xl font-bold mb-6 text-center">Momentos</h2>
+          <h2 className="text-2xl font-bold mb-6">Momentos</h2>
           <GalleryGrid event={event} onOpenPhoto={onOpenPhoto} cols={3} />
         </section>
       )}
     </>
+  );
+}
+
+/**
+ * Layout “Elegante central” — foto de referência mhBhr
+ * Card flutuante, nav, título serifado, faixas de info, galeria.
+ */
+function LayoutRevista(p: Props) {
+  const { event, canBuy, onOpenPhoto } = p;
+  const cover =
+    event.cover_image_url ||
+    event.images[0]?.url ||
+    null;
+
+  return (
+    <div className="relative min-h-screen py-6 md:py-10 px-3 md:px-6">
+      {/* Fundo ambiente */}
+      <div
+        className="fixed inset-0 -z-10 bg-cover bg-center scale-105 blur-sm opacity-40"
+        style={{
+          backgroundImage: cover
+            ? `url(${cover})`
+            : "linear-gradient(135deg,#1a1208,#0a0a0f)",
+        }}
+      />
+      <div className="fixed inset-0 -z-10 bg-black/75" />
+
+      <div className="mx-auto max-w-4xl rounded-[1.5rem] md:rounded-[2rem] overflow-hidden border border-white/10 bg-[#12141a]/95 shadow-2xl shadow-black/60">
+        {/* Nav interna */}
+        <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 px-4 py-4 md:py-5 text-sm text-white/70 border-b border-white/5">
+          <a href="#topo" className="hover:text-white transition">
+            Home
+          </a>
+          <a href="/inscrever" className="hover:text-white transition">
+            Inscrições
+          </a>
+          <a href="#galeria" className="hover:text-white transition">
+            Percursos
+          </a>
+          <a href="#sobre" className="hover:text-white transition">
+            Sobre
+          </a>
+          <a href="#contato" className="hover:text-white transition">
+            Contato
+          </a>
+        </nav>
+
+        {/* Hero foto + título */}
+        <div id="topo" className="relative">
+          <div className="relative aspect-[16/9] md:aspect-[2.1/1] overflow-hidden">
+            {cover ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={cover}
+                alt=""
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-900/40 to-slate-900" />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            <div className="absolute inset-0 flex items-center justify-center px-6 text-center">
+              <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-medium tracking-wide text-[#f5f0e8] drop-shadow-xl leading-[1.1]">
+                {event.name.includes("\n")
+                  ? event.name.split("\n").map((line, i) => (
+                      <span key={i} className="block">
+                        {line}
+                      </span>
+                    ))
+                  : (() => {
+                      // Se o nome terminar com ano, quebra em 2 linhas
+                      const m = event.name.match(/^(.*?)(\s+\d{4})$/);
+                      if (m) {
+                        return (
+                          <>
+                            <span className="block">{m[1].trim()}</span>
+                            <span className="block mt-1 md:mt-2">{m[2].trim()}</span>
+                          </>
+                        );
+                      }
+                      return event.name;
+                    })()}
+              </h1>
+            </div>
+          </div>
+        </div>
+
+        {/* Faixa de info */}
+        <div className="grid grid-cols-2 md:grid-cols-4 border-t border-white/10">
+          <div className="px-4 py-5 border-b md:border-b-0 md:border-r border-white/10">
+            <p className="text-sm font-medium text-white capitalize">
+              {formatDateLongBR(event.event_date)}
+            </p>
+          </div>
+          {(event.categories.length
+            ? event.categories.slice(0, 3)
+            : ["—"]
+          ).map((cat, i) => (
+            <div
+              key={cat + i}
+              className="px-4 py-5 border-b md:border-b-0 md:border-r border-white/10 last:border-r-0 flex items-center"
+            >
+              <p className="text-sm font-semibold text-white/90">{cat}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="px-5 md:px-8 py-5 border-t border-white/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <p className="text-sm text-white/75">
+            {event.location}
+            {event.city ? `, ${event.city}` : ""}
+            {event.start_time ? ` · ${event.start_time}` : ""}
+          </p>
+          {canBuy && (
+            <Link
+              href="/inscrever"
+              className="inline-flex justify-center rounded-xl bg-brand px-6 py-2.5 text-sm font-bold text-white hover:bg-brand-dark shrink-0"
+            >
+              Inscreva-se · {formatBRL(event.price_cents)}
+            </Link>
+          )}
+        </div>
+
+        {/* Galeria horizontal */}
+        {event.images.length > 0 && (
+          <div
+            id="galeria"
+            className="px-4 md:px-6 pb-8 pt-2 border-t border-white/5"
+          >
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
+              {event.images.map((img) => (
+                <button
+                  key={img.id}
+                  type="button"
+                  onClick={() => onOpenPhoto(img.url)}
+                  className="relative h-28 w-40 md:h-32 md:w-48 shrink-0 overflow-hidden rounded-xl border border-white/10 group"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={img.url}
+                    alt=""
+                    className="h-full w-full object-cover transition group-hover:scale-105"
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div id="sobre" className="px-5 md:px-8 pb-8">
+          <p className="text-sm text-muted leading-relaxed whitespace-pre-line">
+            {event.description}
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -314,44 +607,7 @@ function LayoutVitrine(p: Props) {
   );
 }
 
-/** Layout 4 — Revista: letreiro top, depois ingresso, mosaico */
-function LayoutRevista(p: Props) {
-  const { event, canBuy, onOpenPhoto } = p;
-  return (
-    <>
-      <section className="pt-28 pb-10 px-4 border-b border-border">
-        <div className="mx-auto max-w-4xl text-center">
-          <Badges canBuy={canBuy} center light />
-          <h1 className="font-display mt-4 text-5xl md:text-7xl font-black tracking-tight leading-[1.05]">
-            {event.name}
-          </h1>
-          <div className="mt-6 flex justify-center">
-            <MetaLine event={event} />
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-md px-4 py-10">
-        <TicketCard event={event} canBuy={canBuy} light />
-      </section>
-
-      {event.images.length > 0 && (
-        <section className="mx-auto w-full max-w-6xl px-4 pb-8">
-          <h2 className="text-xl font-bold mb-4">Galeria</h2>
-          <GalleryGrid event={event} onOpenPhoto={onOpenPhoto} cols={4} />
-        </section>
-      )}
-
-      <section className="mx-auto max-w-3xl px-4 py-8">
-        <p className="text-muted leading-relaxed whitespace-pre-line text-center text-lg">
-          {event.description}
-        </p>
-      </section>
-    </>
-  );
-}
-
-/** Layout 5 — Catálogo: ingresso top, fotos 2 colunas */
+/** Layout 5 — Catálogo */
 function LayoutCatalogo(p: Props) {
   const { event, canBuy, onOpenPhoto } = p;
   return (

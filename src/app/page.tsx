@@ -55,6 +55,8 @@ export default function HomePage() {
     !!event?.registration_open && (event?.slots_remaining ?? 0) > 0;
 
   const lightLayouts = layout === "vitrine" || layout === "catalogo";
+  // Layouts “elegante” e “noturno” já têm hierarquia própria (nav/full-bleed)
+  const hideSiteHeader = layout === "revista" || layout === "poster";
 
   return (
     <div
@@ -90,7 +92,9 @@ export default function HomePage() {
 
       {event && (
         <>
-          <SiteHeader solid={lightLayouts || layout === "revista"} />
+          {!hideSiteHeader && (
+            <SiteHeader solid={lightLayouts || layout === "bilheteria"} />
+          )}
 
           <HomeHeroByLayout
             event={event}
