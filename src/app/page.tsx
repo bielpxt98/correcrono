@@ -54,9 +54,12 @@ export default function HomePage() {
   const canBuy =
     !!event?.registration_open && (event?.slots_remaining ?? 0) > 0;
 
-  const lightLayouts = layout === "vitrine" || layout === "catalogo";
-  // Layouts “elegante” e “noturno” já têm hierarquia própria (nav/full-bleed)
+  // Layouts claros / com painel lateral
+  const lightLayouts = layout === "split" || layout === "magazine";
+  // Elegante e noturno: hierarquia própria (sem header fixo sólido)
   const hideSiteHeader = layout === "revista" || layout === "poster";
+  // Capa full: header transparente sobre a foto
+  const solidHeader = lightLayouts;
 
   return (
     <div
@@ -67,7 +70,6 @@ export default function HomePage() {
       style={{
         ...colorVarsStyle(color),
         fontFamily,
-        // CSS var para títulos usarem a mesma fonte
         ["--home-font" as string]: fontFamily,
       }}
     >
@@ -92,9 +94,7 @@ export default function HomePage() {
 
       {event && (
         <>
-          {!hideSiteHeader && (
-            <SiteHeader solid={lightLayouts || layout === "bilheteria"} />
-          )}
+          {!hideSiteHeader && <SiteHeader solid={solidHeader} />}
 
           <HomeHeroByLayout
             event={event}

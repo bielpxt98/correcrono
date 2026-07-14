@@ -3,7 +3,11 @@ export type LayoutId =
   | "poster"
   | "vitrine"
   | "revista"
-  | "catalogo";
+  | "catalogo"
+  | "neon"
+  | "split"
+  | "stadium"
+  | "magazine";
 
 export type FontId =
   | "geist"
@@ -11,7 +15,13 @@ export type FontId =
   | "oswald"
   | "playfair"
   | "space"
-  | "roboto";
+  | "roboto"
+  | "poppins"
+  | "bebas"
+  | "raleway"
+  | "lora"
+  | "barlow"
+  | "inter";
 
 export type ColorId =
   | "laranja"
@@ -21,7 +31,15 @@ export type ColorId =
   | "vermelho"
   | "dourado"
   | "rosa"
-  | "cinza";
+  | "cinza"
+  | "ciano"
+  | "coral"
+  | "midnight"
+  | "amarelo"
+  | "teal"
+  | "indigo"
+  | "branco"
+  | "fogo";
 
 export type LayoutOption = {
   id: LayoutId;
@@ -37,7 +55,6 @@ export type FontOption = {
   name: string;
   description: string;
   cssVar: string;
-  /** Valor completo para font-family inline (mais confiável na home) */
   family: string;
 };
 
@@ -45,7 +62,6 @@ export type ColorOption = {
   id: ColorId;
   name: string;
   description: string;
-  /** CSS vars aplicadas na home */
   vars: {
     brand: string;
     brandDark: string;
@@ -62,10 +78,10 @@ export type ColorOption = {
 export const LAYOUTS: LayoutOption[] = [
   {
     id: "bilheteria",
-    name: "Chegada (CTA)",
+    name: "Capa + letreiro",
     description:
-      "Hero com foto de chegada, botão Inscreva-se, dados do evento e cards de categorias — como o layout de atleta na foto.",
-    structure: "Hero foto + CTA | data/local | cards categorias",
+      "Foto de capa sempre atrás do título da corrida, com card de ingresso à direita.",
+    structure: "Capa full | título + ingresso",
     previewBg: "#0b0c10",
     accent: "#ff6a1a",
   },
@@ -73,8 +89,8 @@ export const LAYOUTS: LayoutOption[] = [
     id: "poster",
     name: "Noturno cinematográfico",
     description:
-      "Foto full-bleed noturna, título grande embaixo, pílulas de categoria e botão Saiba Mais.",
-    structure: "Foto full | título inferior | pílulas + Saiba Mais",
+      "Foto full-bleed, título grande embaixo, pílulas de categoria e Saiba Mais.",
+    structure: "Foto full | título inferior | pílulas",
     previewBg: "#050508",
     accent: "#ffffff",
   },
@@ -82,26 +98,62 @@ export const LAYOUTS: LayoutOption[] = [
     id: "revista",
     name: "Elegante central",
     description:
-      "Card flutuante com navegação, título serifado sobre a foto, faixas de info e galeria de momentos.",
+      "Card flutuante com nav, título sobre a foto, faixas de info e galeria.",
     structure: "Nav | foto + título | info | galeria",
     previewBg: "#12141a",
     accent: "#e8e0d4",
   },
   {
+    id: "neon",
+    name: "Neon esporte",
+    description:
+      "Capa escura com título neon, faixa de stats e botão de destaque.",
+    structure: "Capa | título neon | stats | CTA",
+    previewBg: "#0a0a12",
+    accent: "#22d3ee",
+  },
+  {
+    id: "split",
+    name: "Split foto/texto",
+    description:
+      "Metade capa, metade painel com título, dados e ingresso.",
+    structure: "50% capa | 50% conteúdo",
+    previewBg: "#0f172a",
+    accent: "#f97316",
+  },
+  {
+    id: "stadium",
+    name: "Estádio wide",
+    description:
+      "Capa panorâmica, título centralizado e categorias em fileira.",
+    structure: "Capa wide | título centro | categorias",
+    previewBg: "#111827",
+    accent: "#fbbf24",
+  },
+  {
+    id: "magazine",
+    name: "Revista editorial",
+    description:
+      "Capa como capa de revista, número do ano e texto editorial.",
+    structure: "Capa revista | ano | texto | ingresso",
+    previewBg: "#1c1917",
+    accent: "#e7e5e4",
+  },
+  {
     id: "vitrine",
     name: "Vitrine de fotos",
-    description: "Faixa de fotos no topo, depois título + ingresso.",
-    structure: "Faixa fotos | título + card",
-    previewBg: "#f8fafc",
+    description: "Faixa de fotos no topo; título sobre a capa do evento.",
+    structure: "Faixa fotos | capa + título + card",
+    previewBg: "#0b0c10",
     accent: "#0ea5e9",
   },
   {
     id: "catalogo",
     name: "Catálogo",
-    description: "Ingresso em destaque no topo, fotos em colunas.",
-    structure: "Card top | 2 colunas fotos",
-    previewBg: "#fafafa",
-    accent: "#171717",
+    description: "Capa no topo com título, ingresso e grade de fotos.",
+    structure: "Capa + título | card | grade",
+    previewBg: "#0b0c10",
+    accent: "#a3a3a3",
   },
 ];
 
@@ -147,6 +199,48 @@ export const FONTS: FontOption[] = [
     description: "Neutra",
     cssVar: "var(--font-roboto)",
     family: "var(--font-roboto), 'Roboto', system-ui, sans-serif",
+  },
+  {
+    id: "poppins",
+    name: "Poppins",
+    description: "Arredondada",
+    cssVar: "var(--font-poppins)",
+    family: "var(--font-poppins), 'Poppins', system-ui, sans-serif",
+  },
+  {
+    id: "bebas",
+    name: "Bebas Neue",
+    description: "Impacto",
+    cssVar: "var(--font-bebas)",
+    family: "var(--font-bebas), 'Bebas Neue', Impact, sans-serif",
+  },
+  {
+    id: "raleway",
+    name: "Raleway",
+    description: "Leve e fina",
+    cssVar: "var(--font-raleway)",
+    family: "var(--font-raleway), 'Raleway', system-ui, sans-serif",
+  },
+  {
+    id: "lora",
+    name: "Lora",
+    description: "Serif clássica",
+    cssVar: "var(--font-lora)",
+    family: "var(--font-lora), 'Lora', Georgia, serif",
+  },
+  {
+    id: "barlow",
+    name: "Barlow Condensed",
+    description: "Compacta",
+    cssVar: "var(--font-barlow)",
+    family: "var(--font-barlow), 'Barlow Condensed', system-ui, sans-serif",
+  },
+  {
+    id: "inter",
+    name: "Inter",
+    description: "UI limpa",
+    cssVar: "var(--font-inter)",
+    family: "var(--font-inter), 'Inter', system-ui, sans-serif",
   },
 ];
 
@@ -284,6 +378,134 @@ export const COLORS: ColorOption[] = [
       border: "#e5e5e5",
     },
   },
+  {
+    id: "ciano",
+    name: "Ciano neon",
+    description: "Escuro com ciano",
+    vars: {
+      brand: "#06b6d4",
+      brandDark: "#0891b2",
+      brandSoft: "#22d3ee",
+      background: "#020617",
+      foreground: "#ecfeff",
+      card: "#0f172a",
+      card2: "#1e293b",
+      muted: "#94a3b8",
+      border: "#334155",
+    },
+  },
+  {
+    id: "coral",
+    name: "Coral sunset",
+    description: "Coral e fundo escuro",
+    vars: {
+      brand: "#f97316",
+      brandDark: "#ea580c",
+      brandSoft: "#fb923c",
+      background: "#1c0a00",
+      foreground: "#fff7ed",
+      card: "#292524",
+      card2: "#3f3a36",
+      muted: "#a8a29e",
+      border: "#57534e",
+    },
+  },
+  {
+    id: "midnight",
+    name: "Meia-noite",
+    description: "Azul profundo",
+    vars: {
+      brand: "#3b82f6",
+      brandDark: "#1d4ed8",
+      brandSoft: "#93c5fd",
+      background: "#020617",
+      foreground: "#f8fafc",
+      card: "#0f172a",
+      card2: "#1e293b",
+      muted: "#64748b",
+      border: "#1e3a5f",
+    },
+  },
+  {
+    id: "amarelo",
+    name: "Amarelo largada",
+    description: "Preto e amarelo",
+    vars: {
+      brand: "#eab308",
+      brandDark: "#ca8a04",
+      brandSoft: "#facc15",
+      background: "#0a0a0a",
+      foreground: "#fefce8",
+      card: "#171717",
+      card2: "#262626",
+      muted: "#a3a3a3",
+      border: "#404040",
+    },
+  },
+  {
+    id: "teal",
+    name: "Teal outdoor",
+    description: "Verde-água",
+    vars: {
+      brand: "#14b8a6",
+      brandDark: "#0d9488",
+      brandSoft: "#5eead4",
+      background: "#042f2e",
+      foreground: "#f0fdfa",
+      card: "#134e4a",
+      card2: "#115e59",
+      muted: "#99f6e4",
+      border: "#2dd4bf55",
+    },
+  },
+  {
+    id: "indigo",
+    name: "Índigo elite",
+    description: "Roxo-azul elegante",
+    vars: {
+      brand: "#6366f1",
+      brandDark: "#4f46e5",
+      brandSoft: "#a5b4fc",
+      background: "#0c0a1a",
+      foreground: "#eef2ff",
+      card: "#1e1b4b",
+      card2: "#312e81",
+      muted: "#a5b4fc",
+      border: "#4338ca55",
+    },
+  },
+  {
+    id: "branco",
+    name: "Branco clean",
+    description: "Claro com destaque",
+    vars: {
+      brand: "#ea580c",
+      brandDark: "#c2410c",
+      brandSoft: "#fb923c",
+      background: "#ffffff",
+      foreground: "#0f172a",
+      card: "#f8fafc",
+      card2: "#f1f5f9",
+      muted: "#64748b",
+      border: "#e2e8f0",
+    },
+  },
+  {
+    id: "fogo",
+    name: "Fogo urbano",
+    description: "Vermelho e laranja",
+    vars: {
+      brand: "#ff3d00",
+      brandDark: "#dd2c00",
+      brandSoft: "#ff6e40",
+      background: "#120600",
+      foreground: "#fff3e0",
+      card: "#1a0a00",
+      card2: "#2d1200",
+      muted: "#ffab91",
+      border: "#bf360c55",
+    },
+  },
 ];
 
 export function isLayoutId(v: unknown): v is LayoutId {
@@ -300,7 +522,7 @@ export function isColorId(v: unknown): v is ColorId {
 
 export function resolveLayout(v: unknown): LayoutId {
   if (v === "light" || v === "minimal") return "vitrine";
-  if (v === "neon") return "poster";
+  if (v === "neon-old") return "neon";
   if (v === "classic") return "revista";
   return isLayoutId(v) ? v : "bilheteria";
 }
@@ -318,7 +540,6 @@ export function getColorOption(id: unknown): ColorOption {
   return COLORS.find((c) => c.id === resolved)!;
 }
 
-/** Estilo inline das CSS vars da paleta (sobrescreve layout) */
 export function colorVarsStyle(id: unknown): React.CSSProperties {
   const c = getColorOption(id).vars;
   return {

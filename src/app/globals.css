@@ -274,62 +274,26 @@ button {
   font-family: inherit !important;
 }
 
-/* Cores por layout estrutural */
-.home-theme[data-layout="bilheteria"] {
-  /* usa :root laranja/escuro */
+/* Layouts: paleta padrão vem do theme_color (inline). Apenas fallbacks leves. */
+.home-theme[data-layout="poster"],
+.home-theme[data-layout="neon"],
+.home-theme[data-layout="stadium"],
+.home-theme[data-layout="bilheteria"],
+.home-theme[data-layout="vitrine"],
+.home-theme[data-layout="catalogo"] {
+  /* fundo escuro por padrão se a cor não sobrescrever */
 }
 
-/* Noturno cinematográfico */
-.home-theme[data-layout="poster"] {
-  --background: #050508;
-  --foreground: #fafafa;
-  --brand: #ff6a1a;
-  --brand-dark: #e05500;
-  --brand-soft: #ff9a4d;
-  --card: #14161c;
-  --card-2: #1a1d26;
-  --muted: #a3a3a3;
-  --border: #333;
-}
-
-.home-theme[data-layout="vitrine"] {
-  --background: #f1f5f9;
-  --foreground: #0f172a;
-  --brand: #0284c7;
-  --brand-dark: #0369a1;
-  --brand-soft: #0ea5e9;
-  --card: #ffffff;
-  --card-2: #f8fafc;
-  --muted: #64748b;
-  --border: #e2e8f0;
-}
-
-/* Elegante central */
 .home-theme[data-layout="revista"] {
   --background: #0a0a0f;
-  --foreground: #f5f0e8;
-  --brand: #ff6a1a;
-  --brand-dark: #e05500;
-  --brand-soft: #e8e0d4;
-  --card: #132033;
-  --card-2: #1a2a42;
-  --muted: #94a3b8;
-  --border: #2a3f5f;
 }
 
-.home-theme[data-layout="catalogo"] {
-  --background: #fafafa;
-  --foreground: #0a0a0a;
-  --brand: #171717;
-  --brand-dark: #000;
-  --brand-soft: #525252;
-  --card: #ffffff;
-  --card-2: #f5f5f5;
-  --muted: #737373;
-  --border: #e5e5e5;
+.home-theme[data-layout="split"],
+.home-theme[data-layout="magazine"] {
+  /* painel lateral usa --background / --card da paleta */
 }
 
-/* Fontes da home (fallback se o style inline não vier) */
+/* Fontes da home */
 .home-theme[data-font="geist"] {
   --home-font: var(--font-geist-sans), system-ui, sans-serif;
 }
@@ -347,6 +311,24 @@ button {
 }
 .home-theme[data-font="roboto"] {
   --home-font: var(--font-roboto), "Roboto", system-ui, sans-serif;
+}
+.home-theme[data-font="poppins"] {
+  --home-font: var(--font-poppins), "Poppins", system-ui, sans-serif;
+}
+.home-theme[data-font="bebas"] {
+  --home-font: var(--font-bebas), "Bebas Neue", Impact, sans-serif;
+}
+.home-theme[data-font="raleway"] {
+  --home-font: var(--font-raleway), "Raleway", system-ui, sans-serif;
+}
+.home-theme[data-font="lora"] {
+  --home-font: var(--font-lora), "Lora", Georgia, serif;
+}
+.home-theme[data-font="barlow"] {
+  --home-font: var(--font-barlow), "Barlow Condensed", system-ui, sans-serif;
+}
+.home-theme[data-font="inter"] {
+  --home-font: var(--font-inter), "Inter", system-ui, sans-serif;
 }
 
 /* Ajustes de contraste no layout light/minimal no hero gradient */
